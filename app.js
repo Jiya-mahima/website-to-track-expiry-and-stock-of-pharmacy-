@@ -42,6 +42,7 @@ function loadProfile() {
 // Logout
 function logoutUser() {
   localStorage.removeItem("loggedIn");
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
+
 
