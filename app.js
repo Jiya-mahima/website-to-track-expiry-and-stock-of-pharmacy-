@@ -8,7 +8,7 @@ function signupUser(e) {
   if (name && email && password) {
     localStorage.setItem("user", JSON.stringify({ name, email, password }));
     alert("Account created! You can now log in.");
-    window.location.href = "login.html";
+    window.location.href = "index.html";
   } else {
     alert("Please fill all fields!");
   }
@@ -44,5 +44,6 @@ function logoutUser() {
   localStorage.removeItem("loggedIn");
   window.location.href = "index.html";
 }
+
 
 
