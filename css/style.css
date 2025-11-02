@@ -1,0 +1,339 @@
+ * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background-color: #f4f6f8;
+      color: #333;
+    }
+
+    /* Sidebar */
+/* ======= Sidebar Common Style (Use on all pages) ======= */
+
+.sidebar {
+  width: 300px;
+  background-color: #0b214a;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;         /* Full height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
+  z-index: 999 !important;
+}
+
+/* Profile & Brand */
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.sidebar .profile-pic {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: white;
+}
+
+/* Menu Items */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.nav-list li {
+  width: 100%;
+  padding: 14px 0;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 6px;
+}
+
+.nav-list li a {
+  text-decoration: none;
+  color: white;
+  width: 100%;
+  display: block;
+}
+
+/* Hover & Active */
+.nav-list li:hover {
+  background-color: #19376d;
+}
+
+.nav-list li.active {
+  background-color: #5d8ee9;
+}
+
+/* ===== Main Page (Right Content) ===== */
+.main {
+  margin-left: 300px;     /* Equal to sidebar width */
+  width: calc(100% - 300px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Sidebar Menu Styling */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    padding: 12px 15px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+ul li a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+}
+
+/* Hover Effect */
+ul li:hover {
+    background: #5d8ee9;
+    color: white;
+}
+
+/* Active Menu Item */
+ul li.active {
+    background: #a6bfee;
+    color: white;
+}
+
+
+.brand-name {
+  margin-left: -15px; /* move it left (try -10px to -20px based on your preference) */
+  text-align: left; /* ensures text aligns properly */
+}
+
+    /* Main content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background-color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: fixed;
+      width: 79%;
+      
+    }
+
+    .topbar h2 {
+      color: #0b214a;
+      font-size: 20px;
+    }
+
+    
+    .search-box {
+      display: flex;
+      align-items: center;
+      background-color: #f0f2f7;
+      border-radius: 25px;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      background: none;
+      padding: 8px 12px;
+      width: 200px;
+      font-size: 14px;
+    }
+
+    .search-box button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 8px;
+      color: #1f3c88;
+      font-size: 16px;
+    }
+
+    .search-box button:hover {
+      color: #365dcf;
+    }
+
+
+    /* Dashboard image + overlay cards */
+  .dashboard-wrapper {
+  flex: 1;
+  margin-top: 70px; /* Height of the topbar */
+}
+
+.dashboard-content {
+  background-image: url('../image/j.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+    .cards {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      padding: 20px;
+      min-width: 180px;
+      text-align: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      color: #0b214a;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #444;
+    }
+
+
+    @media (max-width: 768px) {
+      .cards {
+        flex-direction: column;
+      }
+      .sidebar {
+        display: none;
+      }
+    }
+ /* Main Content Area */
+.main-content {
+  padding: 30px;
+  display: flex;
+  justify-content: center;  /* Center the container */
+  align-items: flex-start;
+  width: 100%;
+  min-height: calc(100vh - 70px); /* adjusts height after topbar */
+  background-color: #f4f6f8;
+}
+
+/* White Card Form Container */
+.container {
+  background: #ffffff;
+  width: 70%;
+  max-width: 650px;     /* prevents extra width on large screens */
+  padding: 30px 35px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Title of Form */
+.container h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #0b8f75;
+  font-size: 26px;
+  font-weight: 600;
+  padding-top: 20px;
+}
+
+/* Form Styling */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 11px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #b8b8b8;
+  outline: none;
+  transition: 0.3s ease-in-out;
+  background-color: #fff;
+}
+
+/* Focus Effect */
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #0b8f75;
+  box-shadow: 0 0 6px rgba(11, 143, 117, 0.4);
+}
+
+/* Add Button */
+.btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 13px;
+  background: #0b8f75;
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+.btn:hover {
+  background: #09775f;
+  transform: translateY(-2px);
+}

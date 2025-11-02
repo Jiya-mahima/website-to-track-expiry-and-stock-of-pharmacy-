@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inventory - PharmaWise</title>
+
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- SheetJS for Excel parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    :root{ --sidebar-w:300px; --brand-dark:#0b214a; --brand-green:#0b8f75; --muted:#f4f6f8 }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222}
+    /* Sidebar */
+    .sidebar{ position:fixed; left:0; top:0; bottom:0; width:var(--sidebar-w); background:var(--brand-dark); color:#fff; display:flex; flex-direction:column; align-items:center; padding-top:28px }
+    .sidebar-header{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:8px; padding:6px 8px }
+    .profile-pic{ width:85px; height:85px; border-radius:50%; object-fit:cover; border:3px solid #fff; background:#fff }
+    .brand-name{ font-size:20px; font-weight:700; text-transform:capitalize }
+    .nav-list{ width:100%; padding:8px 0 0 0; margin:0; list-style:none }
+    .nav-list li{ padding:12px 22px; cursor:pointer }
+    .nav-list li a{ color:#eaf3ff; text-decoration:none; display:block; width:100% }
+    .nav-list li:hover{ background:#19376d }
+    .nav-list li.active{ background:#2b5f83; color:#fff }
+
+    /* Main */
+    .main { margin-left:var(--sidebar-w); width:calc(100% - var(--sidebar-w)); min-height:100vh; display:flex; flex-direction:column }
+    .topbar{ position:sticky; top:0; z-index:50; background:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 6px rgba(0,0,0,0.06) }
+    .topbar h2{ color:var(--brand-dark); font-size:18px; margin:0 }
+    .content-area{ padding:20px }
+
+    /* Panel / form */
+    .panel{ background:#fff; border-radius:10px; padding:16px; box-shadow:0 6px 18px rgba(8,48,88,0.04) }
+    .toolbar{ display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap }
+    .btn{ background:var(--brand-green); color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer }
+    .btn.grey{ background:#f0f2f7; color:#123; border:1px solid #e6eefc }
+    .file-wrapper{ display:inline-flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:#f7fafb; border:1px dashed #d9e6ef }
+
+    /* table */
+    .table-wrap{ overflow:auto; max-height:62vh; margin-top:6px }
+    table{ width:100%; border-collapse:collapse; font-size:14px; min-width:900px }
+    th,td{ padding:10px 12px; border-bottom:1px solid #eef3fb; text-align:left }
+    th{ background:#f8fbff; color:#0b214a; position:sticky; top:0; z-index:2 }
+    .status-safe{ background:#e7f9ee; color:#137a2f; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
+    .status-low{ background:#fff0f0; color:#a60000; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
+    .status-expiring{ background:#fff7e6; color:#8a6d00; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
+
+    .form-inline{ display:flex; gap:10px; flex-wrap:wrap; align-items:end; margin-bottom:12px }
+    .form-inline label{ font-size:13px }
+    .form-inline input, .form-inline select{ padding:8px; border-radius:6px; border:1px solid #cfcfcf }
+
+    @media (max-width:900px){ .table-wrap{ max-height:40vh } .topbar h2{ font-size:16px } }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="image/logo.jpg" alt="logo" class="profile-pic" />
+      <div class="brand-name">PharmaTrack</div>
+      <div style="font-size:12px;color:#cfead6">Admin: admin abc</div>
+    </div>
+
+    <ul class="nav-list">
+      <li><a href="index.html">Home</a></li>
+      <li class="active"><a href="inventory.html">Inventory</a></li>
+      <li><a href="add_medicine.html">Add Medicines</a></li>
+      <li><a href="expiry.html">Expiry</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h2>Inventory Management</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-size:13px;color:#666">Inventory (Excel → LocalStorage sync)</div>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="panel">
+        <div class="toolbar">
+          <button class="btn" id="btnAddRedirect">➕ Add Medicine</button>
+
+          <label class="file-wrapper" title="Upload Excel (replace inventory)">
+            <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
+            <span>Upload Excel (Medicine Name, Batch No, Category, Qty, Expiry Date)</span>
+          </label>
+
+          <button class="btn grey" id="btnClear">Clear Inventory</button>
+          <button class="btn grey" id="btnExport">Export to Excel</button>
+        </div>
+
+        <!-- Inline manual add (optional) -->
+        <div class="form-inline" id="manualForm">
+          <div>
+            <label>Medicine Name</label><br>
+            <input id="m_name" />
+          </div>
+          <div>
+            <label>Batch No.</label><br>
+            <input id="m_batch" />
+          </div>
+          <div>
+            <label>Category</label><br>
+            <input id="m_cat" />
+          </div>
+          <div>
+            <label>Qty</label><br>
+            <input id="m_qty" type="number" min="0" />
+          </div>
+          <div>
+            <label>Expiry Date</label><br>
+            <input id="m_expiry" placeholder="MM/YYYY or DD/MM/YYYY" />
+          </div>
+          <div>
+            <button class="btn" id="btnAddManual">Add</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="inventoryTable">
+            <thead>
+              <tr>
+                <th>Medicine Name</th>
+                <th>Batch No.</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* Inventory -> LocalStorage sync
+   Key: pharma_inventory_v1
+   Excel columns expected: Medicine Name, Batch No, Category, Qty, Expiry Date
+*/
+
+const STORAGE_KEY = 'pharma_inventory_v1';
+const lowStockThreshold = 10;
+
+// small helpers
+function parseExpiryToDate(str){
+  if(!str) return null;
+  if(str instanceof Date) return str;
+  const s = String(str).trim();
+  // MM/YYYY or M/YYYY
+  let mmyy = s.match(/^(\d{1,2})[\/\-](\d{4})$/);
+  if(mmyy){
+    const m = parseInt(mmyy[1],10);
+    const y = parseInt(mmyy[2],10);
+    return new Date(y, m, 0, 23,59,59); // last day of month
+  }
+  // DD/MM/YYYY
+  let ddmmyyy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(ddmmyyy){
+    const d = parseInt(ddmmyyy[1],10);
+    const m = parseInt(ddmmyyy[2],10);
+    const y = parseInt(ddmmyyy[3],10);
+    return new Date(y, m-1, d, 23,59,59);
+  }
+  // try Date.parse
+  const iso = Date.parse(s);
+  if(!isNaN(iso)) return new Date(iso);
+  return null;
+}
+
+function computeStatus(row){
+  const qty = Number(row['Qty'] ?? row['qty'] ?? 0);
+  const expiryRaw = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '';
+  const d = parseExpiryToDate(expiryRaw);
+  const now = new Date();
+  if(!isNaN(qty) && qty < lowStockThreshold) return 'LOW STOCK';
+  if(d){
+    const diffDays = Math.ceil((d - now)/(1000*60*60*24));
+    if(diffDays < 0) return 'EXPIRED';
+    if(diffDays <= 90) return 'EXPIRING';
+    return 'SAFE';
+  }
+  return 'UNKNOWN';
+}
+
+function statusBadge(s){
+  if(s === 'LOW STOCK') return `<span class="status-low">${s}</span>`;
+  if(s === 'EXPIRED') return `<span class="status-low">${s}</span>`;
+  if(s === 'EXPIRING') return `<span class="status-expiring">${s}</span>`;
+  if(s === 'SAFE') return `<span class="status-safe">${s}</span>`;
+  return `<span class="status-safe">${s}</span>`;
+}
+
+function loadInventory(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return [];
+    return JSON.parse(raw);
+  }catch(e){
+    console.warn('load error',e);
+    return [];
+  }
+}
+
+function saveInventory(arr){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+function renderTable(){
+  const tbody = document.querySelector('#inventoryTable tbody');
+  const data = loadInventory();
+  tbody.innerHTML = '';
+  data.forEach((r,idx)=>{
+    const status = computeStatus(r);
+    const expiry = (r['Expiry Date'] ?? r['Expiry']) || '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(r['Medicine Name'] ?? r.name ?? '')}</td>
+      <td>${escapeHtml(r['Batch No.'] ?? r.batch ?? '')}</td>
+      <td>${escapeHtml(r['Category'] ?? r.category ?? '')}</td>
+      <td>${escapeHtml(r['Qty'] ?? r.qty ?? '')}</td>
+      <td>${escapeHtml(expiry)}</td>
+      <td>${statusBadge(status)}</td>
+      <td><button class="btn grey" data-idx="${idx}" onclick="removeRow(${idx})">Delete</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function escapeHtml(t){ if(t===undefined||t===null) return ''; return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+function removeRow(idx){
+  const arr = loadInventory();
+  if(!confirm('Delete this row?')) return;
+  arr.splice(idx,1);
+  saveInventory(arr);
+  renderTable();
+}
+
+// Excel upload handling (replace inventory)
+document.getElementById('excelFile').addEventListener('change', function(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    const data = evt.target.result;
+    let workbook;
+    try{
+      workbook = XLSX.read(data, {type:'binary'});
+    }catch(err){
+      alert('Invalid file format.');
+      return;
+    }
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const json = XLSX.utils.sheet_to_json(worksheet, {defval:''});
+    if(!json || !json.length){ alert('No rows found'); return; }
+
+    // normalize keys and ensure expected columns
+    const normalized = json.map(r=>{
+      return {
+        'Medicine Name': r['Medicine Name'] ?? r['Medicine'] ?? r['medicine name'] ?? r['Name'] ?? r['name'] ?? '',
+        'Batch No': r['Batch No'] ?? r['Batch No.'] ?? r['Batch'] ?? r['batch'] ?? '',
+        'Category': r['Category'] ?? r['category'] ?? '',
+        'Qty': (r['Qty'] ?? r['Quantity'] ?? r['qty'] ?? 0),
+        'Expiry Date': r['Expiry Date'] ?? r['Expiry'] ?? r['expiry'] ?? r['Expiry Date'] ?? ''
+      };
+    });
+
+    saveInventory(normalized);
+    renderTable();
+    e.target.value = '';
+    alert('Inventory replaced from Excel and saved to LocalStorage.');
+  };
+  reader.readAsBinaryString(f);
+});
+
+// manual add button
+document.getElementById('btnAddManual').addEventListener('click', ()=>{
+  const name = document.getElementById('m_name').value.trim();
+  if(!name){ alert('Enter medicine name'); return; }
+  const batch = document.getElementById('m_batch').value.trim();
+  const cat = document.getElementById('m_cat').value.trim();
+  const qty = Number(document.getElementById('m_qty').value) || 0;
+  const expiry = document.getElementById('m_expiry').value.trim();
+
+  const arr = loadInventory();
+  arr.push({
+    'Medicine Name': name,
+    'Batch No': batch,
+    'Category': cat,
+    'Qty': qty,
+    'Expiry Date': expiry
+  });
+  saveInventory(arr);
+  renderTable();
+  // clear fields
+  document.getElementById('m_name').value='';
+  document.getElementById('m_batch').value='';
+  document.getElementById('m_cat').value='';
+  document.getElementById('m_qty').value='';
+  document.getElementById('m_expiry').value='';
+});
+
+// clear
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  if(!confirm('Clear local inventory?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  renderTable();
+});
+
+// Redirect to add_medicine.html
+document.getElementById('btnAddRedirect').addEventListener('click', ()=>{
+  window.location.href = 'add_medicine.html';
+});
+
+// Export current inventory to Excel
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  const data = loadInventory();
+  if(!data || !data.length){ alert('No data to export'); return; }
+  // convert to worksheet
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+  XLSX.writeFile(wb, 'inventory_export.xlsx');
+});
+
+// initial render
+renderTable();
+</script>
+</body>
+</html>

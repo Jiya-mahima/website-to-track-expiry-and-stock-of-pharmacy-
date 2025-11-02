@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inventory - PharmaWise</title>
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- SheetJS (XLSX) for Excel parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    /* ---------- Basic layout (sidebar + topbar + main) ---------- */
+    :root{
+      --sidebar-w:280px;
+      --brand-green:#0b8f75;
+      --brand-dark:#0b214a;
+      --muted:#f4f6f8;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222}
+    /* Sidebar */
+    /* Sidebar */
+/* ======= Sidebar Common Style (Use on all pages) ======= */
+
+.sidebar {
+  width: 300px;
+  background-color: #0b214a;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;         /* Full height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
+    z-index: 999 !important;
+}
+
+/* Profile & Brand */
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.sidebar .profile-pic {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: white;
+}
+
+/* Menu Items */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.nav-list li {
+  width: 100%;
+  padding: 14px 0;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 6px;
+}
+
+.nav-list li a {
+  text-decoration: none;
+  color: white;
+  width: 100%;
+  display: block;
+}
+
+/* Hover & Active */
+.nav-list li:hover {
+  background-color: #19376d;
+}
+
+.nav-list li.active {
+  background-color: #5d8ee9;
+}
+
+/* ===== Main Page (Right Content) ===== */
+.main {
+  margin-left: 300px;     /* Equal to sidebar width */
+  width: calc(100% - 300px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+    /* Topbar - fixed */
+    
+    .topbar {
+      background-color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .topbar h2 {
+      color: #0b214a;
+      font-size: 20px;
+    }
+    .search-box{ display:flex; align-items:center; gap:8px; background:#f2f6fb; padding:6px 10px; border-radius:20px; border:1px solid #e6eefc }
+    .search-box input{ border:none; outline:none; background:transparent; padding:6px; width:230px }
+
+    /* Content area (scrollable) */
+    .content-area{ padding:22px; }
+
+    /* Inventory panel */
+    .panel {
+      background:#fff; border-radius:10px; padding:18px; box-shadow:0 6px 18px rgba(8,48,88,0.04);
+    }
+    .panel .toolbar{ display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap }
+    .btn { background:var(--brand-green); color:#fff; padding:10px 14px; border-radius:8px; border:none; cursor:pointer }
+    .btn.secondary { background:#2b74d6 }
+    .btn.grey { background:#f0f2f7; color:#123; border:1px solid #e6eefc }
+
+    /* File input styled */
+    .file-wrapper{ display:inline-flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:#f7fafb; border:1px dashed #d9e6ef }
+    .file-wrapper input[type=file]{ display:inline-block }
+
+    /* Table */
+    .table-wrap{ overflow:auto; max-height:62vh; padding-top:6px }
+    table{ width:100%; border-collapse:collapse; font-size:14px; min-width:900px }
+    th,td{ padding:10px 12px; border-bottom:1px solid #eef3fb; text-align:left }
+    th{ background:#f8fbff; color:#0b214a; position:sticky; top:0; z-index:2 }
+    .status-safe{ background:#e7f9ee; color:#137a2f; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
+    .status-low{ background:#fff0f0; color:#a60000; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
+    .status-expiring{ background:#fff7e6; color:#8a6d00; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
+
+    /* Action buttons small */
+    .action-btn{ background:#eef6f9; color:#0b214a; border-radius:6px; padding:6px 10px; border:0; cursor:pointer }
+
+    /* Responsive */
+    @media (max-width:900px){
+      .search-box input{ width:120px }
+      .panel{ padding:12px }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="image/logo.jpg" alt="logo" class="profile-pic" />
+      <div class="brand-name">PharmaTrack</div>
+     
+    </div>
+
+    <ul class="nav-list">
+      <li><a href="home.html">Home</a></li>
+      <li class="active"><a href="inventory.html">Inventory</a></li>
+      <li><a href="add_medicine.html">Add Medicines</a></li>
+      <li><a href="expiry.html">Expiry</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h2>Pharmacy Inventory Management</h2>
+      <div class="search-box">
+        <input id="globalSearch" placeholder="Search inventory..." />
+        <button id="searchBtn" title="Search"><i class="fa fa-search"></i></button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div class="toolbar">
+            <button class="btn" id="addBtn">➕ Add Medicine</button>
+            <label class="file-wrapper" title="Upload Excel">
+              <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
+              <span style="font-size:13px">Upload Excel (XLSX / CSV)</span>
+            </label>
+            <button class="btn grey" id="clearBtn" title="Clear inventory">Clear Inventory</button>
+          </div>
+
+          <div style="font-size:13px;color:#555">Tip: upload Excel with headers: <strong>Medicine Name, Batch No., Category, Qty, Expiry Date, Status</strong></div>
+        </div>
+
+        <div class="table-wrap" id="tableWrap">
+          <table id="inventoryTable">
+            <thead>
+              <tr>
+                <th>Medicine Name</th>
+                <th>Batch No.</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- rows injected here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /********************
+     Utility & state
+    ********************/
+    const STORAGE_KEY = 'pharma_inventory_v1';
+
+    // default demo rows
+    const demoData = [
+      { "Medicine Name":"Amoxicillin 250mg","Batch No.":"AX-345-C","Category":"Tablet","Qty":36,"Expiry Date":"10/2026","Status":"" },
+      { "Medicine Name":"Infant Syrup ABC","Batch No.":"INF-124-1","Category":"Syrup","Qty":120,"Expiry Date":"01/2026","Status":"" },
+      { "Medicine Name":"Vitamin D Capsule","Batch No.":"VTD-908","Category":"Capsule","Qty":450,"Expiry Date":"08/2027","Status":"" }
+    ];
+
+    /********************
+     Render utilities
+    ********************/
+    function parseExpiryToDate(str) {
+      // Accepts formats: MM/YYYY, YYYY-MM-DD, Date object, or Excel serial (handled elsewhere)
+      if(!str) return null;
+      if(str instanceof Date) return str;
+      // if format like 01/2026 or 1/2026 => treat as month/year -> set to last day of month
+      const mmYYYY = str.match(/^(\d{1,2})[\/\-](\d{4})$/);
+      if(mmYYYY){
+        const m = parseInt(mmYYYY[1],10);
+        const y = parseInt(mmYYYY[2],10);
+        // set day to last day of month
+        return new Date(y, m, 0, 23,59,59);
+      }
+      // ISO-like
+      const iso = Date.parse(str);
+      if(!isNaN(iso)) return new Date(iso);
+      return null;
+    }
+
+    function computeStatus(row){
+      // status rules:
+      // if qty <= 20 -> LOW STOCK
+      // else if expiry within 90 days -> EXPIRING
+      // else SAFE
+      const qty = Number(row['Qty'] || row['Qty']===0 ? row['Qty'] : row['quantity'] || 0);
+      const expiryStr = row['Expiry Date'] || row['Expiry'] || row['expiry'] || '';
+      const d = parseExpiryToDate(expiryStr);
+      const now = new Date();
+      if(!isNaN(qty) && qty <= 20) return 'LOW STOCK';
+      if(d){
+        const diffDays = Math.ceil((d - now) / (1000*60*60*24));
+        if(diffDays <= 90) return 'EXPIRING';
+      }
+      return 'SAFE';
+    }
+
+    function formatExpiryForDisplay(str){
+      const d = parseExpiryToDate(str);
+      if(!d) return str || '';
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      return `${mm}/${yyyy}`;
+    }
+
+    function rowToTr(row){
+      const tr = document.createElement('tr');
+      const name = row['Medicine Name'] || row['name'] || '';
+      const batch = row['Batch No.'] || row['batch'] || '';
+      const category = row['Category'] || row['category'] || '';
+      const qty = row['Qty'] || row['qty'] || row['Quantity'] || 0;
+      const expiryRaw = row['Expiry Date'] || row['Expiry'] || row['expiry'] || '';
+      const expiry = formatExpiryForDisplay(expiryRaw);
+      const status = computeStatus({ 'Qty': qty, 'Expiry Date': expiryRaw });
+
+      tr.innerHTML = `
+        <td>${escapeHtml(name)}</td>
+        <td>${escapeHtml(batch)}</td>
+        <td>${escapeHtml(category)}</td>
+        <td>${escapeHtml(qty)}</td>
+        <td>${escapeHtml(expiry)}</td>
+        <td>${statusToBadge(status)}</td>
+        <td><button class="action-btn" data-batch="${escapeHtml(batch)}">Details</button></td>
+      `;
+      return tr;
+    }
+
+    function statusToBadge(s){
+      if(!s) return '';
+      if(s === 'LOW STOCK') return `<span class="status-low">${s}</span>`;
+      if(s === 'EXPIRING') return `<span class="status-expiring">${s}</span>`;
+      return `<span class="status-safe">${s}</span>`;
+    }
+
+    function escapeHtml(t){ if(t===undefined || t===null) return ''; return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    /********************
+     Storage: load / save
+    ********************/
+    function loadInventory(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return demoData.slice();
+        return JSON.parse(raw);
+      }catch(e){
+        console.warn('load error', e);
+        return demoData.slice();
+      }
+    }
+
+    function saveInventory(arr){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    }
+
+    /********************
+     Render table
+    ********************/
+    function renderTable(data){
+      const tbody = document.querySelector('#inventoryTable tbody');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        tbody.appendChild(rowToTr(row));
+      });
+      attachDetailButtons();
+    }
+
+    function refreshUI(){
+      const data = loadInventory();
+      renderTable(data);
+    }
+
+    /********************
+     Search filter
+    ********************/
+    function filterTable(text){
+      text = (text||'').toLowerCase().trim();
+      const rows = document.querySelectorAll('#inventoryTable tbody tr');
+      rows.forEach(r=>{
+        const txt = r.innerText.toLowerCase();
+        r.style.display = txt.includes(text) ? '' : 'none';
+      });
+    }
+
+    document.getElementById('globalSearch').addEventListener('input', (e)=>{
+      filterTable(e.target.value);
+    });
+
+    /********************
+     File upload (Excel) handling
+    ********************/
+    document.getElementById('excelFile').addEventListener('change', function(e){
+      const f = e.target.files[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = function(evt){
+        const data = evt.target.result;
+        let workbook;
+        try {
+          workbook = XLSX.read(data, {type: 'binary'});
+        } catch(err){
+          alert('Failed to parse file. Make sure it is a valid Excel or CSV file.');
+          return;
+        }
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet, {raw:false, defval:''});
+        if(!json || !json.length){
+          alert('No rows found in the uploaded sheet.');
+          return;
+        }
+        // Expected headers: Medicine Name, Batch No., Category, Qty, Expiry Date, Status
+        // Normalize keys (in case user uses small letters)
+        const normalized = json.map(r=>{
+          const out = {};
+          // try to map common header variations
+          out['Medicine Name'] = r['Medicine Name'] ?? r['Medicine'] ?? r['name'] ?? r['medicine name'] ?? r['MedicineName'] ?? '';
+          out['Batch No.'] = r['Batch No.'] ?? r['Batch'] ?? r['Batch No'] ?? r['batch'] ?? '';
+          out['Category'] = r['Category'] ?? r['category'] ?? '';
+          out['Qty'] = r['Qty'] ?? r['Quantity'] ?? r['Qty.'] ?? r['qty'] ?? 0;
+          out['Expiry Date'] = r['Expiry Date'] ?? r['Expiry'] ?? r['expiry'] ?? r['ExpiryDate'] ?? '';
+          out['Status'] = r['Status'] ?? '';
+          return out;
+        });
+
+        // Replace existing table with uploaded data
+        saveInventory(normalized);
+        renderTable(normalized);
+        // Clear file input value so same file can be uploaded again if needed
+        e.target.value = '';
+        alert('Excel uploaded and inventory replaced successfully.');
+      };
+      // read as binary string
+      reader.readAsBinaryString(f);
+    });
+
+    /********************
+     Add button (redirect)
+    ********************/
+    document.getElementById('addBtn').addEventListener('click', () => {
+      window.location.href = 'add_medicine.html';
+    });
+
+    /********************
+     Clear Inventory
+    ********************/
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      if(!confirm('This will clear saved inventory (local). Continue?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      refreshUI();
+    });
+
+    /********************
+     Details buttons (attach)
+    ********************/
+    function attachDetailButtons(){
+      document.querySelectorAll('.action-btn').forEach(b=>{
+        b.addEventListener('click', (ev)=>{
+          const batch = b.getAttribute('data-batch');
+          alert('Details for batch: ' + batch + '\\n(Implement details view as needed.)');
+        });
+      });
+    }
+
+    /********************
+     Active menu highlighting
+    ********************/
+    (function highlightActive(){
+      const current = window.location.pathname.split('/').pop() || 'inventory.html';
+      document.querySelectorAll('.nav-list li').forEach(li=>{
+        const a = li.querySelector('a');
+        if(!a) return;
+        const href = a.getAttribute('href');
+        if(href === current) li.classList.add('active');
+        else li.classList.remove('active');
+      });
+    })();
+
+    /********************
+     Init
+    ********************/
+    window.addEventListener('load', ()=>{
+      refreshUI();
+    });
+
+  </script>
+</body>
+</html>

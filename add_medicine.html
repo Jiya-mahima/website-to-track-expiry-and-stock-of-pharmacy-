@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pharmacy Inventory Management</title>
+  <link rel="stylesheet" href="css/style.css">
+
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  
+</head>
+<body>
+
+<!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="image/logo.jpg" alt="Pharmacy Logo" class="profile-pic">
+      <h2 class="brand-name">PharmaTrack</h2>
+    </div>
+
+   <ul class="nav-list">
+     <li >
+ 
+  <a href="home.html" >Home</a>
+</li>
+
+<li >
+ 
+  <a href="inventory.html" >Inventory</a>
+</li>
+
+<li class="active">
+
+  <a href="add_medicine.html" >Add Medicines</a>
+</li>
+
+<li>
+ 
+  <a href="expiry.html">Expiry</a>
+</li>
+
+<li>
+
+  <a href="profile.html">Profile</a>
+</li>
+
+    </ul>
+
+  </div>
+
+
+
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="topbar">
+      <h2>Pharmacy Inventory Management</h2>
+      
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>🩺 Add New Medicine</h1>
+            <form id="addStockForm">
+                <div class="form-group">
+                    <label>Medicine Name:</label>
+                    <input type="text" id="medicineName" name="medicineName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="Tablet">Tablet</option>
+                        <option value="Syrup">Syrup</option>
+                        <option value="Pills">Pills</option>
+                        <option value="Injection">Injection</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Batch Number:</label>
+                    <input type="text" id="batchNumber" name="batchNumber" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Expiry Date:</label>
+                    <input type="month" id="expiryDate" name="expiryDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Unit Cost:</label>
+                    <input type="number" id="unitCost" name="unitCost" min="0.01" step="0.01" required>
+                </div>
+
+                <button type="submit" class="btn">➕ Add Medicine</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('addStockForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('medicineName').value,
+                batch: document.getElementById('batchNumber').value,
+                category: document.getElementById('category').value,
+                expiry: document.getElementById('expiryDate').value,
+                quantity: document.getElementById('quantity').value,
+                status: 'SAFE'
+            };
+
+            let stock = JSON.parse(localStorage.getItem('medicineStock')) || [];
+            stock.push(formData);
+            localStorage.setItem('medicineStock', JSON.stringify(stock));
+
+            alert('Medicine Stock Added Successfully! Redirecting to inventory Page.');
+            window.location.href = 'inventory.html';
+        });
+    </script>
+
+  </div>
+</body>
+</html>
