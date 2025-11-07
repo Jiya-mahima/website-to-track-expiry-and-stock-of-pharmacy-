@@ -455,39 +455,11 @@
     window.addEventListener('load', ()=>{
       refreshUI();
     });
-function loadInventory() {
-    let stock = JSON.parse(localStorage.getItem('medicineStock')) || [];
-    const tableBody = document.getElementById('inventoryTableBody');
 
-    tableBody.innerHTML = ""; // Clear table before loading
-
-    stock.forEach((item, index) => {
-      const row = `
-        <tr>
-          <td>${item.name}</td>
-          <td>${item.batch}</td>
-          <td>${item.category}</td>
-          <td>${item.quantity}</td>
-          <td>${item.expiry}</td>
-          <td>${item.status}</td>
-          <td><button onclick="deleteItem(${index})">Delete</button></td>
-        </tr>
-      `;
-      tableBody.innerHTML += row;
-    });
-  }
-
-  function deleteItem(index) {
-    let stock = JSON.parse(localStorage.getItem('medicineStock')) || [];
-    stock.splice(index, 1);
-    localStorage.setItem('medicineStock', JSON.stringify(stock));
-    loadInventory(); // Refresh table after delete
-  }
-
-  window.onload = loadInventory;
   </script>
 </body>
 </html>
+
 
 
 
