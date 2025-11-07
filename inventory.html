@@ -8,7 +8,7 @@
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- SheetJS (XLSX) for Excel parsing -->
+  <!-- SheetJS (XLSX) for Excel/CSV parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
@@ -18,143 +18,122 @@
       --brand-green:#0b8f75;
       --brand-dark:#0b214a;
       --muted:#f4f6f8;
+      --panel-width:450px;
+      --overlay-rgba: rgba(0,0,0,0.35);
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222}
     /* Sidebar */
-    /* Sidebar */
-/* ======= Sidebar Common Style (Use on all pages) ======= */
-
-.sidebar {
-  width: 300px;
-  background-color: #0b214a;
-  color: white;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;         /* Full height */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 30px;
-    z-index: 999 !important;
-}
-
-/* Profile & Brand */
-.sidebar-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.sidebar .profile-pic {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 12px;
-}
-
-.brand-name {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 25px;
-  color: white;
-}
-
-/* Menu Items */
-.nav-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
-  width: 100%;
-}
-
-.nav-list li {
-  width: 100%;
-  padding: 14px 0;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.3s;
-  border-radius: 6px;
-}
-
-.nav-list li a {
-  text-decoration: none;
-  color: white;
-  width: 100%;
-  display: block;
-}
-
-/* Hover & Active */
-.nav-list li:hover {
-  background-color: #19376d;
-}
-
-.nav-list li.active {
-  background-color: #5d8ee9;
-}
-
-/* ===== Main Page (Right Content) ===== */
-.main {
-  margin-left: 300px;     /* Equal to sidebar width */
-  width: calc(100% - 300px);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-    /* Topbar - fixed */
-    
-    .topbar {
-      background-color: #fff;
+    .sidebar {
+      width: 300px;
+      background-color: #0b214a;
+      color: white;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;         /* Full height */
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      padding: 15px 30px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding-top: 30px;
+      z-index: 999 !important;
     }
 
-    .topbar h2 {
-      color: #0b214a;
-      font-size: 20px;
-    }
+    .sidebar-header { display:flex; flex-direction:column; align-items:center; margin-bottom:25px }
+    .sidebar .profile-pic { width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:12px }
+    .brand-name { font-size:20px; font-weight:bold; color:white }
+
+    .nav-list { list-style:none; padding:0; margin-top:10px; width:100% }
+    .nav-list li { width:100%; padding:14px 0; text-align:center; cursor:pointer; transition:0.3s; border-radius:6px }
+    .nav-list li a { text-decoration:none; color:white; width:100%; display:block }
+    .nav-list li:hover { background-color:#19376d }
+    .nav-list li.active { background-color:#5d8ee9 }
+
+    /* ===== Main Page (Right Content) ===== */
+    .main { margin-left:300px; width:calc(100% - 300px); min-height:100vh; display:flex; flex-direction:column }
+
+    .topbar { background-color:#fff; display:flex; justify-content:space-between; align-items:center; padding:15px 30px; box-shadow:0 2px 5px rgba(0,0,0,0.1) }
+    .topbar h2 { color:#0b214a; font-size:20px }
     .search-box{ display:flex; align-items:center; gap:8px; background:#f2f6fb; padding:6px 10px; border-radius:20px; border:1px solid #e6eefc }
     .search-box input{ border:none; outline:none; background:transparent; padding:6px; width:230px }
 
-    /* Content area (scrollable) */
-    .content-area{ padding:22px; }
-
-    /* Inventory panel */
-    .panel {
-      background:#fff; border-radius:10px; padding:18px; box-shadow:0 6px 18px rgba(8,48,88,0.04);
-    }
+    .content-area{ padding:22px }
+    .panel { background:#fff; border-radius:10px; padding:18px; box-shadow:0 6px 18px rgba(8,48,88,0.04) }
     .panel .toolbar{ display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap }
     .btn { background:var(--brand-green); color:#fff; padding:10px 14px; border-radius:8px; border:none; cursor:pointer }
     .btn.secondary { background:#2b74d6 }
     .btn.grey { background:#f0f2f7; color:#123; border:1px solid #e6eefc }
 
-    /* File input styled */
     .file-wrapper{ display:inline-flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:#f7fafb; border:1px dashed #d9e6ef }
     .file-wrapper input[type=file]{ display:inline-block }
 
-    /* Table */
     .table-wrap{ overflow:auto; max-height:62vh; padding-top:6px }
     table{ width:100%; border-collapse:collapse; font-size:14px; min-width:900px }
-    th,td{ padding:10px 12px; border-bottom:1px solid #eef3fb; text-align:left }
+    th,td{ padding:10px 12px; border-bottom:1px solid #eef3fb; text-align:left; vertical-align:middle }
     th{ background:#f8fbff; color:#0b214a; position:sticky; top:0; z-index:2 }
     .status-safe{ background:#e7f9ee; color:#137a2f; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
     .status-low{ background:#fff0f0; color:#a60000; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
     .status-expiring{ background:#fff7e6; color:#8a6d00; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
+    .status-expired{ background:#fdecea; color:#8a0000; padding:6px 8px; border-radius:6px; font-weight:700; display:inline-block }
+    .status-out{ background:#f5f5f5; color:#666; padding:6px 8px; border-radius:6px; font-weight:700; display:inline-block }
 
-    /* Action buttons small */
     .action-btn{ background:#eef6f9; color:#0b214a; border-radius:6px; padding:6px 10px; border:0; cursor:pointer }
 
-    /* Responsive */
-    @media (max-width:900px){
-      .search-box input{ width:120px }
-      .panel{ padding:12px }
+    @media (max-width:900px){ .search-box input{ width:120px } .panel{ padding:12px } }
+
+    /* ---------------- Slide-in Details Panel (Light UI) ---------------- */
+    .overlay {
+      position:fixed;
+      inset:0;
+      background: transparent;
+      opacity:0;
+      visibility:hidden;
+      transition: opacity 220ms ease, visibility 220ms ease;
+      z-index:1200;
+      display:flex;
+      justify-content:flex-end;
+    }
+    .overlay.show {
+      background: var(--overlay-rgba);
+      opacity:1;
+      visibility:visible;
+    }
+    .side-panel {
+      width: var(--panel-width);
+      max-width: 100%;
+      height:100%;
+      background: #ffffff;
+      box-shadow: -18px 0 40px rgba(2,15,34,0.12);
+      transform: translateX(110%);
+      transition: transform 260ms cubic-bezier(.2,.9,.2,1);
+      padding:20px 20px;
+      display:flex;
+      flex-direction:column;
+      z-index:1300;
+    }
+    .overlay.show .side-panel { transform: translateX(0); }
+
+    .panel-header { display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid #eef3fb; padding-bottom:12px; margin-bottom:12px }
+    .panel-header h3 { margin:0; color:#0b214a; font-size:18px }
+    .panel-body { overflow:auto; flex:1; padding-right:6px; }
+    .panel-row { display:flex; gap:12px; margin-bottom:10px; align-items:center }
+    .field { flex:1; }
+    .field .label { font-size:12px; color:#6b7280; margin-bottom:6px; display:block }
+    .field .value { font-size:14px; color:#0b214a; font-weight:600 }
+
+    /* two-column compact layout (L3 style) */
+    .two-col { display:grid; grid-template-columns: 1fr 1fr; gap:10px 14px; }
+    .panel-footer { padding-top:12px; border-top:1px solid #f1f5f9; margin-top:12px; display:flex; justify-content:center }
+    .view-full-btn { background:#0b214a; color:#fff; padding:10px 14px; border-radius:8px; border:none; cursor:pointer; width:70% }
+
+    /* small close */
+    .close-btn { background:transparent; border:0; font-size:20px; cursor:pointer; color:#6b7280 }
+
+    /* responsive tweak */
+    @media (max-width:600px){
+      .side-panel{ width:100% }
+      .two-col{ grid-template-columns: 1fr }
+      .view-full-btn{ width:100% }
     }
   </style>
 </head>
@@ -164,7 +143,6 @@
     <div class="sidebar-header">
       <img src="image/logo.jpg" alt="logo" class="profile-pic" />
       <div class="brand-name">PharmaTrack</div>
-     
     </div>
 
     <ul class="nav-list">
@@ -191,14 +169,14 @@
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
           <div class="toolbar">
             <button class="btn" id="addBtn">➕ Add Medicine</button>
-            <label class="file-wrapper" title="Upload Excel">
+            <label class="file-wrapper" title="Upload Excel/CSV">
               <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
-              <span style="font-size:13px">Upload Excel (XLSX / CSV)</span>
+              <span style="font-size:13px">Upload Excel / CSV</span>
             </label>
             <button class="btn grey" id="clearBtn" title="Clear inventory">Clear Inventory</button>
           </div>
 
-          <div style="font-size:13px;color:#555">Tip: upload Excel with headers: <strong>Medicine Name, Batch No., Category, Qty, Expiry Date, Status</strong></div>
+          <div style="font-size:13px;color:#555">Tip: upload Excel/CSV with headers: <strong>Medicine Name, Batch No., Category, Qty, Expiry Date, Status</strong></div>
         </div>
 
         <div class="table-wrap" id="tableWrap">
@@ -223,102 +201,136 @@
     </div>
   </div>
 
+  <!-- Overlay + Side Panel (Details) -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <aside class="side-panel" role="dialog" aria-labelledby="detailsTitle" aria-modal="true">
+      <div class="panel-header">
+        <h3 id="detailsTitle">Medicine Details</h3>
+        <button id="closePanel" class="close-btn" title="Close">&times;</button>
+      </div>
+      <div class="panel-body">
+        <div class="two-col">
+          <div class="field">
+            <span class="label">Expiry Date</span>
+            <div id="detailExpiry" class="value">—</div>
+          </div>
+          <div class="field">
+            <span class="label">Medicine Name</span>
+            <div id="detailName" class="value">—</div>
+          </div>
+
+          <div class="field">
+            <span class="label">Category</span>
+            <div id="detailCategory" class="value">—</div>
+          </div>
+          <div class="field">
+            <span class="label">Batch No.</span>
+            <div id="detailBatch" class="value">—</div>
+          </div>
+
+          <div class="field">
+            <span class="label">Quantity</span>
+            <div id="detailQty" class="value">—</div>
+          </div>
+          <div class="field">
+            <span class="label">Status</span>
+            <div id="detailStatus" class="value">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <button id="viewFullBtn" class="view-full-btn" type="button">View Full Details</button>
+      </div>
+    </aside>
+  </div>
+
   <script>
     /********************
      Utility & state
     ********************/
     const STORAGE_KEY = 'pharma_inventory_v1';
 
-    // default demo rows
-   
     /********************
-     Render utilities
+     Date / Status helpers
     ********************/
     function parseExpiryToDate(str) {
-      // Accepts formats: MM/YYYY, YYYY-MM-DD, Date object, or Excel serial (handled elsewhere)
       if(!str) return null;
-      if(str instanceof Date) return str;
-      // if format like 01/2026 or 1/2026 => treat as month/year -> set to last day of month
+      if (str instanceof Date) return str;
+      // trim
+      str = String(str).trim();
+      // Accept MM/YYYY or M/YYYY
       const mmYYYY = str.match(/^(\d{1,2})[\/\-](\d{4})$/);
       if(mmYYYY){
         const m = parseInt(mmYYYY[1],10);
         const y = parseInt(mmYYYY[2],10);
-        // set day to last day of month
-        return new Date(y, m, 0, 23,59,59);
+        return new Date(y, m, 0, 23,59,59); // last day of month
       }
-      // ISO-like
+      // Try Excel serial number (integer)
+      if(/^\d+$/.test(str) && Number(str) > 59){ // Excel dates start from 1; robust check
+        const serial = Number(str);
+        // Excel serial to JS date (assuming 1900 date system)
+        const utc_days  = serial - 25569;
+        const utc_value = utc_days * 86400;                                        
+        const date_info = new Date(utc_value * 1000);
+        if(!isNaN(date_info)) return date_info;
+      }
+      // ISO / normal parse
       const iso = Date.parse(str);
       if(!isNaN(iso)) return new Date(iso);
+      // fallback null
       return null;
-    }
-
-    function computeStatus(row){
-      // status rules:
-      // if qty <= 20 -> LOW STOCK
-      // else if expiry within 90 days -> EXPIRING
-      // else SAFE
-      const qty = Number(row['Qty'] || row['Qty']===0 ? row['Qty'] : row['quantity'] || 0);
-      const expiryStr = row['Expiry Date'] || row['Expiry'] || row['expiry'] || '';
-      const d = parseExpiryToDate(expiryStr);
-      const now = new Date();
-      if(!isNaN(qty) && qty <= 20) return 'LOW STOCK';
-      if(d){
-        const diffDays = Math.ceil((d - now) / (1000*60*60*24));
-        if(diffDays <= 90) return 'EXPIRING';
-      }
-      return 'SAFE';
     }
 
     function formatExpiryForDisplay(str){
       const d = parseExpiryToDate(str);
-      if(!d) return str || '';
+      if(!d) return (str || '—');
       const mm = String(d.getMonth()+1).padStart(2,'0');
       const yyyy = d.getFullYear();
       return `${mm}/${yyyy}`;
     }
 
-    function rowToTr(row){
-      const tr = document.createElement('tr');
-      const name = row['Medicine Name'] || row['name'] || '';
-      const batch = row['Batch No.'] || row['batch'] || '';
-      const category = row['Category'] || row['category'] || '';
-      const qty = row['Qty'] || row['qty'] || row['Quantity'] || 0;
-      const expiryRaw = row['Expiry Date'] || row['Expiry'] || row['expiry'] || '';
-      const expiry = formatExpiryForDisplay(expiryRaw);
-      const status = computeStatus({ 'Qty': qty, 'Expiry Date': expiryRaw });
+    // Status rules (as requested earlier)
+    function computeStatusFromRow(row){
+      const qtyRaw = row['Qty'] ?? row['qty'] ?? row['Quantity'] ?? row['quantity'] ?? 0;
+      const qty = Number(qtyRaw ?? 0);
+      const expiryStr = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '';
+      const d = parseExpiryToDate(expiryStr);
+      const now = new Date();
 
-      tr.innerHTML = `
-        <td>${escapeHtml(name)}</td>
-        <td>${escapeHtml(batch)}</td>
-        <td>${escapeHtml(category)}</td>
-        <td>${escapeHtml(qty)}</td>
-        <td>${escapeHtml(expiry)}</td>
-        <td>${statusToBadge(status)}</td>
-        <td><button class="action-btn" data-batch="${escapeHtml(batch)}">Details</button></td>
-      `;
-      return tr;
+      if(isNaN(qty) === false && qty === 0) return 'Out of Stock';
+      if(isNaN(qty) === false && qty < 10) return 'Low Stock';
+      if(d){
+        const diffMs = d - now;
+        const diffDays = Math.ceil(diffMs / (1000*60*60*24));
+        if(diffDays < 0) return 'Expired';
+        if(diffDays <= 30) return 'Near Expiry';
+      }
+      return 'In Stock';
     }
 
     function statusToBadge(s){
       if(!s) return '';
-      if(s === 'LOW STOCK') return `<span class="status-low">${s}</span>`;
-      if(s === 'EXPIRING') return `<span class="status-expiring">${s}</span>`;
+      if(s === 'Low Stock') return `<span class="status-low">${s}</span>`;
+      if(s === 'Near Expiry') return `<span class="status-expiring">${s}</span>`;
+      if(s === 'Expired') return `<span class="status-expired">${s}</span>`;
+      if(s === 'Out of Stock') return `<span class="status-out">${s}</span>`;
       return `<span class="status-safe">${s}</span>`;
     }
 
     function escapeHtml(t){ if(t===undefined || t===null) return ''; return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
     /********************
-     Storage: load / save
+     Storage: load / save (no demo data)
     ********************/
     function loadInventory(){
       try{
         const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return demoData.slice();
+        if(!raw) return [];               // <-- NO demo data, return empty array
         return JSON.parse(raw);
       }catch(e){
         console.warn('load error', e);
-        return demoData.slice();
+        return [];
       }
     }
 
@@ -329,12 +341,38 @@
     /********************
      Render table
     ********************/
+    function rowToTr(row, idx){
+      const name = row['Medicine Name'] || row['name'] || '';
+      const batch = row['Batch No.'] || row['Batch No'] === '' ? (row['Batch No.'] ?? row['Batch'] ?? row['batch'] ?? '') : (row['Batch'] ?? row['batch'] ?? '');
+      const category = row['Category'] || row['category'] || '';
+      const qty = row['Qty'] || row['qty'] || row['Quantity'] || 0;
+      const expiryRaw = row['Expiry Date'] || row['Expiry'] || row['expiry'] || '';
+      const expiry = formatExpiryForDisplay(expiryRaw);
+      const status = computeStatusFromRow({ 'Qty': qty, 'Expiry Date': expiryRaw });
+
+      const tr = document.createElement('tr');
+      tr.dataset.index = idx;
+      tr.innerHTML = `
+        <td>${escapeHtml(name)}</td>
+        <td>${escapeHtml(batch)}</td>
+        <td>${escapeHtml(category)}</td>
+        <td>${escapeHtml(qty)}</td>
+        <td>${escapeHtml(expiry)}</td>
+        <td>${statusToBadge(status)}</td>
+        <td><button class="action-btn details-btn" data-index="${idx}">Details</button></td>
+      `;
+      return tr;
+    }
+
     function renderTable(data){
       const tbody = document.querySelector('#inventoryTable tbody');
       tbody.innerHTML = '';
-      data.forEach(row => {
-        tbody.appendChild(rowToTr(row));
-      });
+      if(!data || data.length === 0){
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#666;padding:18px">No Data Available</td></tr>`;
+        attachDetailButtons(); // still attach nothing
+        return;
+      }
+      data.forEach((row, i) => tbody.appendChild(rowToTr(row, i)));
       attachDetailButtons();
     }
 
@@ -360,7 +398,7 @@
     });
 
     /********************
-     File upload (Excel) handling
+     File upload (Excel / CSV) handling
     ********************/
     document.getElementById('excelFile').addEventListener('change', function(e){
       const f = e.target.files[0];
@@ -382,26 +420,24 @@
           alert('No rows found in the uploaded sheet.');
           return;
         }
-        // Expected headers: Medicine Name, Batch No., Category, Qty, Expiry Date, Status
-        // Normalize keys (in case user uses small letters)
+
+        // Normalize keys to expected names
         const normalized = json.map(r=>{
-          const out = {};
-          // try to map common header variations
-          out['Medicine Name'] = r['Medicine Name'] ?? r['Medicine'] ?? r['name'] ?? r['medicine name'] ?? r['MedicineName'] ?? '';
-          out['Batch No.'] = r['Batch No.'] ?? r['Batch'] ?? r['Batch No'] ?? r['batch'] ?? '';
-          out['Category'] = r['Category'] ?? r['category'] ?? '';
-          out['Qty'] = r['Qty'] ?? r['Quantity'] ?? r['Qty.'] ?? r['qty'] ?? 0;
-          out['Expiry Date'] = r['Expiry Date'] ?? r['Expiry'] ?? r['expiry'] ?? r['ExpiryDate'] ?? '';
-          out['Status'] = r['Status'] ?? '';
-          return out;
+          return {
+            'Medicine Name': r['Medicine Name'] ?? r['Medicine'] ?? r['medicine name'] ?? r['medicine'] ?? '',
+            'Batch No.': r['Batch No.'] ?? r['Batch'] ?? r['batch'] ?? '',
+            'Category': r['Category'] ?? r['category'] ?? '',
+            'Qty': (r['Qty'] ?? r['Quantity'] ?? r['qty'] ?? 0),
+            'Expiry Date': r['Expiry Date'] ?? r['Expiry'] ?? r['expiry'] ?? '',
+            'Status': r['Status'] ?? ''
+          };
         });
 
-        // Replace existing table with uploaded data
+        // Save to localStorage and render (replace existing)
         saveInventory(normalized);
         renderTable(normalized);
-        // Clear file input value so same file can be uploaded again if needed
         e.target.value = '';
-        alert('Excel uploaded and inventory replaced successfully.');
+        alert('File uploaded and inventory replaced successfully.');
       };
       // read as binary string
       reader.readAsBinaryString(f);
@@ -427,13 +463,73 @@
      Details buttons (attach)
     ********************/
     function attachDetailButtons(){
-      document.querySelectorAll('.action-btn').forEach(b=>{
-        b.addEventListener('click', (ev)=>{
-          const batch = b.getAttribute('data-batch');
-          alert('Details for batch: ' + batch + '\\n(Implement details view as needed.)');
-        });
+      document.querySelectorAll('.details-btn').forEach(b=>{
+        b.removeEventListener('click', onDetailsClick); // safe remove if previously attached
+        b.addEventListener('click', onDetailsClick);
       });
     }
+
+    // Details panel elements
+    const overlay = document.getElementById('overlay');
+    const closePanelBtn = document.getElementById('closePanel');
+    const detailExpiry = document.getElementById('detailExpiry');
+    const detailName = document.getElementById('detailName');
+    const detailCategory = document.getElementById('detailCategory');
+    const detailBatch = document.getElementById('detailBatch');
+    const detailQty = document.getElementById('detailQty');
+    const detailStatus = document.getElementById('detailStatus');
+    const viewFullBtn = document.getElementById('viewFullBtn');
+
+    function onDetailsClick(e){
+      const idx = Number(this.dataset.index);
+      const data = loadInventory();
+      const row = data[idx];
+      if(!row) return;
+
+      // Fill details (show exactly the selected fields)
+      detailExpiry.textContent = formatExpiryForDisplay(row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '');
+      detailName.textContent = row['Medicine Name'] ?? row['name'] ?? '';
+      detailCategory.textContent = row['Category'] ?? row['category'] ?? '';
+      detailBatch.textContent = row['Batch No.'] ?? row['Batch'] ?? row['batch'] ?? '';
+      detailQty.textContent = String(row['Qty'] ?? row['qty'] ?? row['Quantity'] ?? 0);
+      detailStatus.textContent = computeStatusFromRow(row);
+
+      // show overlay + panel
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+
+      // optional: view full (for now just scroll to row or alert - you said view-only; we keep a placeholder)
+      viewFullBtn.onclick = function(){
+        // If you later want to implement a full page, redirect here.
+        // For now, just bring focus to the table row (small UX)
+        const tr = document.querySelector(`#inventoryTable tbody tr[data-index="${idx}"]`);
+        if(tr){
+          tr.scrollIntoView({behavior:'smooth', block:'center'});
+          tr.style.backgroundColor = '#fff8e5';
+          setTimeout(()=> tr.style.backgroundColor = '', 1200);
+        }
+      };
+    }
+
+    // Close behavior
+    closePanelBtn.addEventListener('click', ()=> {
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden', 'true');
+    });
+    // Clicking outside the panel (on overlay) closes too
+    overlay.addEventListener('click', (ev)=>{
+      if(ev.target === overlay){
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    });
+    // Escape key to close
+    window.addEventListener('keydown', (ev)=>{
+      if(ev.key === 'Escape' && overlay.classList.contains('show')){
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    });
 
     /********************
      Active menu highlighting
@@ -455,12 +551,6 @@
     window.addEventListener('load', ()=>{
       refreshUI();
     });
-
   </script>
 </body>
 </html>
-
-
-
-
-
