@@ -13,19 +13,25 @@
 
   <style>
     :root{
-      --sidebar-w:280px;
+      --sidebar-w:300px;
+      --brand-blue: #0b214a;
       --brand-green:#0b8f75;
-      --brand-dark:#0b214a;
       --muted:#f4f6f8;
+      --panel-width:460px;
+      --overlay: rgba(2,10,40,0.45);
       --card-bg: #ffffff;
       --card-border: #e6eefc;
+      --accent: #2b74d6;
+      --radius: 12px;
     }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222}
-    /* Sidebar */
+    body{margin:0;font-family:Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+
+    /* ---------- Sidebar ---------- */
     .sidebar {
-      width: 300px;
-      background-color: #0b214a;
+      width: var(--sidebar-w);
+      background-color: var(--brand-blue);
       color: white;
       position: fixed;
       top: 0;
@@ -34,66 +40,113 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-top: 30px;
-      z-index: 999;
+      padding-top: 28px;
+      z-index: 900;
+      box-shadow: 0 6px 18px rgba(2,15,34,0.12);
     }
-    .sidebar-header { display:flex; flex-direction:column; align-items:center; margin-bottom:25px }
-    .sidebar .profile-pic { width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:12px }
-    .brand-name { font-size:20px; font-weight:bold; color:white }
-    .nav-list { list-style:none; padding:0; margin-top:10px; width:100% }
-    .nav-list li { width:100%; padding:14px 0; text-align:center; cursor:pointer; transition:0.3s; border-radius:6px }
-    .nav-list li a { text-decoration:none; color:white; width:100%; display:block }
-    .nav-list li:hover { background-color:#19376d }
-    .nav-list li.active { background-color:#5d8ee9 }
+    .sidebar-header { text-align:center; margin-bottom:20px }
+    .profile-pic { width:74px; height:74px; border-radius:14px; object-fit:cover; border:3px solid rgba(255,255,255,0.06) }
+    .brand-name { font-size:18px; font-weight:700; margin-top:8px; letter-spacing:0.3px }
+    .nav-list { list-style:none; padding:0; margin-top:18px; width:100% }
+    .nav-list li { width:100%; padding:12px 18px; text-align:left; cursor:pointer; transition: all 180ms ease; color:#dbe7ff }
+    .nav-list li a{ color:inherit; text-decoration:none; display:flex; align-items:center; gap:10px }
+    .nav-list li:hover { background: rgba(255,255,255,0.03) }
+    .nav-list li.active { background: rgba(255,255,255,0.06); color:white; font-weight:600; border-left:4px solid var(--accent) }
 
-    /* Main */
-    .main { margin-left:300px; width:calc(100% - 300px); min-height:100vh; display:flex; flex-direction:column }
-    .topbar { background-color:#fff; display:flex; justify-content:space-between; align-items:center; padding:15px 30px; box-shadow:0 2px 5px rgba(0,0,0,0.1) }
-    .topbar h2 { color:#0b214a; font-size:20px }
-    .search-box{ display:flex; align-items:center; gap:8px; background:#f2f6fb; padding:6px 10px; border-radius:20px; border:1px solid #e6eefc }
-    .search-box input{ border:none; outline:none; background:transparent; padding:6px; width:230px }
+    /* ---------- Main ---------- */
+    .main { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); min-height: 100vh; display:flex; flex-direction:column; }
+    .topbar { background:#fff; display:flex; justify-content:space-between; align-items:center; padding:16px 26px; box-shadow: 0 2px 6px rgba(2,15,34,0.06); z-index:20 }
+    .topbar h2 { color:var(--brand-blue); font-size:18px; margin:0; letter-spacing:0.2px }
+    .search-box { display:flex; align-items:center; gap:8px; background:#f2f6fb; padding:8px 12px; border-radius:999px; border:1px solid #e9f0ff }
+    .search-box input { border:0; outline:0; background:transparent; width:260px; font-size:14px; color:#234; padding:4px }
 
-    .content-area{ padding:22px }
-    .panel { background:#fff; border-radius:10px; padding:18px; box-shadow:0 6px 18px rgba(8,48,88,0.04) }
-    .panel .toolbar{ display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap }
-    .btn { background:var(--brand-green); color:#fff; padding:10px 14px; border-radius:8px; border:none; cursor:pointer }
-    .btn.grey { background:#f0f2f7; color:#123; border:1px solid #e6eefc }
+    .content-area { padding:22px; }
 
-    .file-wrapper{ display:inline-flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:#f7fafb; border:1px dashed #d9e6ef }
-    .file-wrapper input[type=file]{ display:inline-block }
+    .panel { background:#fff; border-radius:14px; padding:18px; box-shadow: 0 8px 30px rgba(2,15,34,0.06) }
+    .toolbar { display:flex; gap:12px; flex-wrap:wrap; align-items:center }
+    .btn { background:var(--brand-green); color:#fff; padding:9px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:600 }
+    .btn.grey { background:#f0f2f7; color:#123; border:1px solid #e6eefc; font-weight:600 }
+    .file-wrapper { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; background:#f7fafb; border:1px dashed #d9e6ef; font-size:13px; color:#445 }
 
-    .table-wrap{ overflow:auto; max-height:62vh; padding-top:6px }
-    table{ width:100%; border-collapse:collapse; font-size:14px; min-width:900px }
-    th,td{ padding:10px 12px; border-bottom:1px solid #eef3fb; text-align:left; vertical-align:middle }
-    th{ background:#f8fbff; color:#0b214a; position:sticky; top:0; z-index:2 }
+    /* table */
+    .table-wrap { overflow:auto; max-height:64vh; padding-top:8px; }
+    table { width:100%; border-collapse:collapse; min-width:920px; background:transparent }
+    thead th { position:sticky; top:0; background:linear-gradient(180deg,#fbfdff,#f3f9ff); color:var(--brand-blue); padding:12px 14px; text-align:left; font-size:13px; font-weight:700; border-bottom:1px solid #eef3fb }
+    td { padding:12px 14px; border-bottom:1px solid #f1f6fb; vertical-align:middle; font-size:14px }
+    tbody tr:hover { background: rgba(11,33,74,0.02) }
 
-    .status-safe{ background:#e7f9ee; color:#137a2f; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
-    .status-low{ background:#fff0f0; color:#a60000; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
-    .status-expiring{ background:#fff7e6; color:#8a6d00; padding:6px 8px; border-radius:6px; font-weight:600; display:inline-block }
-    .action-btn{ background:#eef6f9; color:#0b214a; border-radius:6px; padding:6px 10px; border:0; cursor:pointer }
+    /* status badges */
+    .status-safe{ background:#e7f9ee; color:#137a2f; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
+    .status-low{ background:#fff0f0; color:#a60000; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
+    .status-expiring{ background:#fff7e6; color:#8a6d00; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
+    .status-expired{ background:#fdecea; color:#8a0000; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
+    .status-out{ background:#f5f5f5; color:#666; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
 
-    /* Details card row style (T2) */
-    .details-row { background:transparent }
-    .details-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 14px;
-      margin: 10px 6px;
-      box-shadow: 0 6px 18px rgba(8,48,88,0.04);
+    .action-btn { border:0; background:#eef6f9; color:var(--brand-blue); padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:600 }
+
+    /* ---------- Right side details panel (professional) ---------- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: transparent;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 240ms ease, visibility 240ms ease;
+      z-index: 1100;
       display:flex;
-      gap:16px;
-      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:stretch;
     }
-    .details-col { flex:1 1 220px; min-width:180px }
-    .details-label { font-size:12px; color:#6b7280; margin-bottom:6px; display:block }
-    .details-value { font-size:14px; color:#0b214a; font-weight:600 }
+    .overlay.show { background: var(--overlay); opacity:1; visibility:visible; }
 
-    /* responsive tweaks */
-    @media (max-width:900px){
-      .search-box input{ width:120px }
-      .panel{ padding:12px }
-      .details-card { flex-direction:column }
+    .detail-panel {
+      width: var(--panel-width);
+      max-width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg,#ffffff,#fbfdff);
+      box-shadow: -20px 0 40px rgba(2,15,34,0.12);
+      transform: translateX(115%);
+      transition: transform 340ms cubic-bezier(.2,.9,.2,1);
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      border-left: 1px solid rgba(11,33,74,0.04);
+      border-top-left-radius: var(--radius);
+      border-bottom-left-radius: var(--radius);
+    }
+    .overlay.show .detail-panel { transform: translateX(0); }
+
+    .detail-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:6px; border-bottom:1px solid #eef6ff }
+    .detail-title { display:flex; gap:12px; align-items:center }
+    .detail-title img { width:46px; height:46px; border-radius:10px; object-fit:cover; box-shadow: 0 6px 18px rgba(11,33,74,0.06) }
+    .detail-title h3 { margin:0; color:var(--brand-blue); font-size:16px; line-height:1; }
+    .detail-sub { font-size:12px; color:#6b7280; margin-top:2px }
+
+    .detail-body { overflow:auto; padding-top:8px; display:flex; flex-direction:column; gap:14px; }
+
+    /* info row card */
+    .info-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:12px; box-shadow: 0 6px 18px rgba(2,15,34,0.04); }
+    .info-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px 12px; }
+    .info-item { display:flex; flex-direction:column; gap:6px; }
+    .info-label { color:#6b7280; font-size:12px; }
+    .info-value { color:var(--brand-blue); font-weight:700; font-size:14px; }
+
+    .desc { color:#344054; font-size:14px; background:#fbfdff; padding:10px; border-radius:8px; border:1px dashed #eef6ff }
+
+    .panel-footer { margin-top:auto; display:flex; gap:12px; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid #f1f6fb }
+    .close-panel { background:transparent; border:0; color:#475569; font-size:16px; cursor:pointer }
+
+    /* small responsive */
+    @media (max-width: 960px){
+      .detail-panel{ width: 90%; max-width:420px }
+      table{ min-width:700px }
+    }
+    @media (max-width: 600px){
+      .sidebar { display:none }
+      .main { margin-left:0; width:100% }
+      .detail-panel { width: 100% }
+      table{ min-width:0 }
     }
   </style>
 </head>
@@ -106,40 +159,49 @@
     </div>
 
     <ul class="nav-list">
-      <li><a href="home.html">Home</a></li>
-      <li class="active"><a href="inventory.html">Inventory</a></li>
-      <li><a href="add_medicine.html">Add Medicines</a></li>
-      <li><a href="expiry.html">Expiry</a></li>
-      <li><a href="profile.html">Profile</a></li>
+      <li><a href="home.html"><i class="fa fa-home"></i> Home</a></li>
+      <li class="active"><a href="inventory.html"><i class="fa fa-capsules"></i> Inventory</a></li>
+      <li><a href="add_medicine.html"><i class="fa fa-plus-square"></i> Add Medicines</a></li>
+      <li><a href="expiry.html"><i class="fa fa-calendar"></i> Expiry</a></li>
+      <li><a href="profile.html"><i class="fa fa-user"></i> Profile</a></li>
     </ul>
   </aside>
 
   <!-- Main -->
   <div class="main">
     <div class="topbar">
-      <h2>Pharmacy Inventory Management</h2>
-      <div class="search-box">
-        <input id="globalSearch" placeholder="Search inventory..." />
-        <button id="searchBtn" title="Search"><i class="fa fa-search"></i></button>
+      <div style="display:flex;flex-direction:column">
+        <h2>Pharmacy Inventory Management</h2>
+        <small style="color:#6b7280;margin-top:6px">Manage stock, expiry and cost — click Details to inspect an item</small>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="search-box">
+          <input id="globalSearch" placeholder="Search inventory..." />
+          <i class="fa fa-search" style="color:#6b7280"></i>
+        </div>
+        <button class="btn" id="addBtn">Add Medicine</button>
       </div>
     </div>
 
     <div class="content-area">
       <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px">
           <div class="toolbar">
-            <button class="btn" id="addBtn">➕ Add Medicine</button>
             <label class="file-wrapper" title="Upload Excel/CSV">
-              <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
-              <span style="font-size:13px">Upload Excel / CSV</span>
+              <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" />
+              <span>Upload Excel / CSV</span>
             </label>
-            <button class="btn grey" id="clearBtn" title="Clear inventory">Clear Inventory</button>
+            <button class="btn grey" id="clearBtn">Clear Inventory</button>
           </div>
 
-          <div style="font-size:13px;color:#555">Tip: upload Excel/CSV with headers: <strong>Medicine Name, Batch No., Category, Qty, Expiry Date, Cost Price, Description</strong></div>
+          <div style="font-size:13px;color:#555;display:flex;align-items:center;gap:8px">
+            <i class="fa fa-info-circle" style="color:#9fb0e8"></i>
+            <div>Upload with headers: <strong>Medicine Name, Batch No., Category, Qty, Expiry Date, Cost Price, Description</strong></div>
+          </div>
         </div>
 
-        <div class="table-wrap" id="tableWrap">
+        <div class="table-wrap" id="tableWrap" role="region" aria-label="Inventory table">
           <table id="inventoryTable" aria-live="polite">
             <thead>
               <tr>
@@ -147,9 +209,9 @@
                 <th>Batch No.</th>
                 <th>Category</th>
                 <th>Qty</th>
-                <th>Expiry Date</th>
+                <th>Expiry</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th style="text-align:center">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -161,14 +223,87 @@
     </div>
   </div>
 
+  <!-- Overlay + Right-side Detail Panel (professional) -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <aside class="detail-panel" role="dialog" aria-labelledby="detailTitle" aria-modal="true">
+      <div class="detail-header">
+        <div class="detail-title">
+          <img id="detailImage" src="image/logo.jpg" alt="medicine" />
+          <div>
+            <h3 id="detailTitle">Medicine Details</h3>
+            <div id="detailSmall" class="detail-sub">Batch • Category • Status</div>
+          </div>
+        </div>
+        <div>
+          <button id="closePanel" class="close-panel" title="Close panel"><i class="fa fa-times"></i></button>
+        </div>
+      </div>
+
+      <div class="detail-body">
+        <div class="info-card" id="overviewCard">
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Medicine Name</div>
+              <div id="panelName" class="info-value">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Category</div>
+              <div id="panelCategory" class="info-value">—</div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-label">Expiry Date</div>
+              <div id="panelExpiry" class="info-value">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Quantity</div>
+              <div id="panelQty" class="info-value">—</div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-label">Cost Price</div>
+              <div id="panelCost" class="info-value">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Status</div>
+              <div id="panelStatus" class="info-value">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-label">Description</div>
+          <div id="panelDesc" class="desc">—</div>
+        </div>
+
+        <!-- extra area if you want to show supplier or meta info later -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1; min-width:150px" class="info-card">
+            <div class="info-label">Added On</div>
+            <div id="panelAdded" class="info-value">—</div>
+          </div>
+          <div style="flex:1; min-width:150px" class="info-card">
+            <div class="info-label">Storage</div>
+            <div id="panelLocation" class="info-value">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div style="color:#6b7280;font-size:13px">Viewing details — read-only</div>
+        <div><button id="closeBtnBottom" class="close-panel">Close</button></div>
+      </div>
+    </aside>
+  </div>
+
   <script>
     /********************
-     Config & storage key
+     Config & storage
     ********************/
-    const STORAGE_KEY = 'inventoryData'; // using the key you provided
+    const STORAGE_KEY = 'inventoryData';
 
     /********************
-     Helpers: parse/format/escape
+     Helpers: parse/format
     ********************/
     function escapeHtml(t){ if(t===undefined||t===null) return ''; return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
@@ -178,8 +313,7 @@
       str = String(str).trim();
       const mmYYYY = str.match(/^(\d{1,2})[\/\-](\d{4})$/);
       if(mmYYYY){
-        const m = parseInt(mmYYYY[1],10);
-        const y = parseInt(mmYYYY[2],10);
+        const m = parseInt(mmYYYY[1],10); const y = parseInt(mmYYYY[2],10);
         return new Date(y, m, 0, 23,59,59);
       }
       const iso = Date.parse(str);
@@ -201,7 +335,6 @@
       const expiryStr = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? row['expiry_date'] ?? '';
       const d = parseExpiryToDate(expiryStr);
       const now = new Date();
-
       if(!isNaN(qty) && qty === 0) return 'Out of Stock';
       if(!isNaN(qty) && qty < 10) return 'Low Stock';
       if(d){
@@ -212,7 +345,7 @@
       return 'In Stock';
     }
 
-    function statusToBadge(s){
+    function statusToBadgeHTML(s){
       if(!s) return '';
       if(s === 'Low Stock') return `<span class="status-low">${s}</span>`;
       if(s === 'Near Expiry') return `<span class="status-expiring">${s}</span>`;
@@ -222,7 +355,7 @@
     }
 
     /********************
-     Storage: load/save (no demo)
+     Storage: load / save
     ********************/
     function loadInventory(){
       try{
@@ -234,41 +367,34 @@
         return [];
       }
     }
-
     function saveInventory(arr){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
     }
 
     /********************
-     Render table rows
+     Render table
     ********************/
-    function normalizeField(row, keys){
-      // return first available key value from keys list
-      for(const k of keys){
-        if(row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k];
-      }
-      return '';
-    }
+    function normalizeFieldValue(row, keys){ for(const k of keys) if(row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k]; return ''; }
 
     function rowToTr(row, idx){
-      const name = normalizeField(row, ['Medicine Name','medicineName','name','Medicine','medicine']);
-      const batch = normalizeField(row, ['Batch No.','Batch No','Batch','batch','batchNo']);
-      const category = normalizeField(row, ['Category','category']);
-      const qty = normalizeField(row, ['Qty','qty','Quantity','quantity']) || 0;
-      const expiryRaw = normalizeField(row, ['Expiry Date','Expiry','expiry','expiry_date']);
+      const name = normalizeFieldValue(row, ['Medicine Name','medicineName','name','Medicine']);
+      const batch = normalizeFieldValue(row, ['Batch No.','Batch No','Batch','batch','batchNo']);
+      const category = normalizeFieldValue(row, ['Category','category']);
+      const qty = normalizeFieldValue(row, ['Qty','qty','Quantity','quantity']) || 0;
+      const expiryRaw = normalizeFieldValue(row, ['Expiry Date','Expiry','expiry','expiry_date']);
       const expiry = formatExpiryForDisplay(expiryRaw);
       const status = computeStatusFromRow(row);
 
       const tr = document.createElement('tr');
       tr.dataset.index = idx;
       tr.innerHTML = `
-        <td>${escapeHtml(name)}</td>
+        <td style="width:220px">${escapeHtml(name)}</td>
         <td>${escapeHtml(batch)}</td>
         <td>${escapeHtml(category)}</td>
         <td>${escapeHtml(qty)}</td>
         <td>${escapeHtml(expiry)}</td>
-        <td>${statusToBadge(status)}</td>
-        <td><button class="action-btn details-btn" data-index="${idx}">Details</button></td>
+        <td>${statusToBadgeHTML(status)}</td>
+        <td style="text-align:center"><button class="action-btn details-btn" data-index="${idx}"><i class="fa fa-info-circle" style="margin-right:6px"></i>Details</button></td>
       `;
       return tr;
     }
@@ -284,26 +410,21 @@
       attachDetailButtons();
     }
 
-    function refreshUI(){
-      const data = loadInventory();
-      renderTable(data);
-    }
+    function refreshUI(){ const data = loadInventory(); renderTable(data); }
 
     /********************
      Search filter
     ********************/
-    function filterTable(text){
-      text = (text||'').toLowerCase().trim();
+    document.getElementById('globalSearch').addEventListener('input', (e)=>{
+      const text = (e.target.value||'').toLowerCase().trim();
       const rows = document.querySelectorAll('#inventoryTable tbody tr');
       rows.forEach(r=>{
-        const txt = r.innerText.toLowerCase();
-        r.style.display = txt.includes(text) ? '' : 'none';
+        r.style.display = r.innerText.toLowerCase().includes(text) ? '' : 'none';
       });
-    }
-    document.getElementById('globalSearch').addEventListener('input', (e)=> filterTable(e.target.value) );
+    });
 
     /********************
-     File upload (Excel/CSV) handling (keeps previous behavior)
+     File upload (Excel/CSV)
     ********************/
     document.getElementById('excelFile').addEventListener('change', function(e){
       const f = e.target.files[0];
@@ -326,21 +447,20 @@
           return;
         }
 
-        // Normalize keys - keep them generic so our render can handle both header styles
+        // Normalize column names to keep things consistent
         const normalized = json.map(r=>{
           return {
-            // try common variations
             'Medicine Name': r['Medicine Name'] ?? r['Medicine'] ?? r['medicine name'] ?? r['medicine'] ?? r['name'] ?? '',
-            'Batch No.': r['Batch No.'] ?? r['Batch No'] ?? r['Batch'] ?? r['batch'] ?? '',
+            'Batch No.': r['Batch No.'] ?? r['Batch'] ?? r['batch'] ?? '',
             'Category': r['Category'] ?? r['category'] ?? '',
             'Qty': r['Qty'] ?? r['Quantity'] ?? r['qty'] ?? 0,
             'Expiry Date': r['Expiry Date'] ?? r['Expiry'] ?? r['expiry'] ?? r['ExpiryDate'] ?? '',
-            'Cost Price': r['Cost Price'] ?? r['Cost'] ?? r['cost'] ?? r['costprice'] ?? r['price'] ?? '',
+            'Cost Price': r['Cost Price'] ?? r['Cost'] ?? r['cost'] ?? r['price'] ?? '',
             'Description': r['Description'] ?? r['description'] ?? r['Notes'] ?? ''
           };
         });
 
-        // Save and render (replace existing)
+        // Save and render
         saveInventory(normalized);
         renderTable(normalized);
         e.target.value = '';
@@ -350,123 +470,94 @@
     });
 
     /********************
-     Attach details toggle behavior
+     Attach detail buttons -> open right panel
     ********************/
+    const overlay = document.getElementById('overlay');
+    const detailPanel = document.querySelector('.detail-panel');
+
     function attachDetailButtons(){
       document.querySelectorAll('.details-btn').forEach(btn=>{
-        btn.removeEventListener('click', detailsToggle); // safety
-        btn.addEventListener('click', detailsToggle);
+        btn.removeEventListener('click', onDetailsClick);
+        btn.addEventListener('click', onDetailsClick);
       });
     }
 
-    function createDetailsRowContent(rowObj){
-      // Fields chosen: 1 (Medicine Name), 3 (Category), 5 (Expiry Date), 7 (Cost Price), 9 (Description)
-      const name = normalizeFieldValue(rowObj, ['Medicine Name','medicineName','name','Medicine']);
-      const category = normalizeFieldValue(rowObj, ['Category','category']);
-      const expiry = formatExpiryForDisplay(normalizeFieldValue(rowObj, ['Expiry Date','Expiry','expiry','expiry_date']));
-      const cost = normalizeFieldValue(rowObj, ['Cost Price','Cost','cost','price']);
-      const description = normalizeFieldValue(rowObj, ['Description','description','Notes','notes']);
+    // panel elements
+    const detailTitle = document.getElementById('detailTitle');
+    const detailSmall = document.getElementById('detailSmall');
+    const detailImage = document.getElementById('detailImage');
+    const panelName = document.getElementById('panelName');
+    const panelCategory = document.getElementById('panelCategory');
+    const panelExpiry = document.getElementById('panelExpiry');
+    const panelQty = document.getElementById('panelQty');
+    const panelCost = document.getElementById('panelCost');
+    const panelStatus = document.getElementById('panelStatus');
+    const panelDesc = document.getElementById('panelDesc');
+    const panelAdded = document.getElementById('panelAdded');
+    const panelLocation = document.getElementById('panelLocation');
 
-      return `
-        <div class="details-card" role="region" aria-label="Medicine details">
-          <div class="details-col">
-            <div class="details-label">Medicine Name</div>
-            <div class="details-value">${escapeHtml(name)}</div>
-          </div>
-
-          <div class="details-col">
-            <div class="details-label">Category</div>
-            <div class="details-value">${escapeHtml(category)}</div>
-          </div>
-
-          <div class="details-col">
-            <div class="details-label">Expiry Date</div>
-            <div class="details-value">${escapeHtml(expiry)}</div>
-          </div>
-
-          <div class="details-col">
-            <div class="details-label">Cost Price</div>
-            <div class="details-value">${escapeHtml(cost)}</div>
-          </div>
-
-          <div class="details-col" style="flex-basis:100%">
-            <div class="details-label">Description</div>
-            <div class="details-value">${escapeHtml(description)}</div>
-          </div>
-        </div>
-      `;
-    }
-
-    function normalizeFieldValue(row, keys){
-      for(const k of keys){
-        if(row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k];
-      }
-      return '';
-    }
-
-    function detailsToggle(e){
-      const btn = e.currentTarget;
-      const idx = Number(btn.dataset.index);
-      const tbody = document.querySelector('#inventoryTable tbody');
-      // If a details row for this index already exists, remove it
-      const existing = tbody.querySelector(`tr.details-row[data-for="${idx}"]`);
-      if(existing){
-        existing.remove();
-        // restore button text if needed
-        return;
-      }
-
-      // remove any other open details rows (optional: keep only one open)
-      const opened = tbody.querySelectorAll('tr.details-row');
-      opened.forEach(r => r.remove());
-
-      // insert a new tr after the clicked row
-      const rowTr = tbody.querySelector(`tr[data-index="${idx}"]`);
-      if(!rowTr) return;
+    function onDetailsClick(e){
+      const idx = Number(e.currentTarget.dataset.index);
       const data = loadInventory();
-      const rowObj = data[idx] ?? {};
+      const item = data[idx] ?? {};
+      // populate fields (selected ones + helpful context)
+      const name = normalizeFieldValue(item, ['Medicine Name','medicineName','name','Medicine']);
+      const batch = normalizeFieldValue(item, ['Batch No.','Batch','batch','batchNo']);
+      const category = normalizeFieldValue(item, ['Category','category']);
+      const qty = normalizeFieldValue(item, ['Qty','qty','Quantity','quantity']) || 0;
+      const expiryRaw = normalizeFieldValue(item, ['Expiry Date','Expiry','expiry','expiry_date']);
+      const expiry = formatExpiryForDisplay(expiryRaw);
+      const cost = normalizeFieldValue(item, ['Cost Price','Cost','cost','price']) || '';
+      const description = normalizeFieldValue(item, ['Description','description','Notes','notes']) || '';
+      const status = computeStatusFromRow(item);
 
-      const detailsTr = document.createElement('tr');
-      detailsTr.className = 'details-row';
-      detailsTr.dataset.for = idx;
-      // one td spanning all columns
-      const td = document.createElement('td');
-      td.colSpan = 7;
-      td.innerHTML = createDetailsRowContent(rowObj);
-      detailsTr.appendChild(td);
+      // header
+      detailTitle.textContent = name || 'Medicine Details';
+      detailSmall.textContent = `${escapeHtml(batch)} • ${escapeHtml(category)} • ${status}`;
+      // image: keep default logo if none provided
+      detailImage.src = item.image || 'image/logo.jpg';
 
-      // insert after rowTr
-      if(rowTr.nextSibling) tbody.insertBefore(detailsTr, rowTr.nextSibling);
-      else tbody.appendChild(detailsTr);
-      // scroll into view slightly so user sees the card
-      detailsTr.scrollIntoView({behavior:'smooth', block:'center'});
+      // body
+      panelName.textContent = name || '—';
+      panelCategory.textContent = category || '—';
+      panelExpiry.textContent = expiry || '—';
+      panelQty.textContent = String(qty);
+      panelCost.textContent = cost ? (escapeHtml(cost) + (typeof cost === 'number' ? '' : '')) : '—';
+      panelStatus.innerHTML = statusToBadgeHTML(status) || '—';
+      panelDesc.textContent = description || '—';
+      panelAdded.textContent = item.addedDate ?? item.added_on ?? '—';
+      panelLocation.textContent = item.location ?? item.storage ?? '—';
+
+      // open panel
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
     }
+
+    // close handlers
+    const closePanelBtn = document.getElementById('closePanel');
+    const closeBtnBottom = document.getElementById('closeBtnBottom');
+    function closePanel(){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+    }
+    closePanelBtn.addEventListener('click', closePanel);
+    closeBtnBottom.addEventListener('click', closePanel);
+    overlay.addEventListener('click', (ev)=>{
+      if(ev.target === overlay) closePanel();
+    });
+    window.addEventListener('keydown', (ev)=>{
+      if(ev.key === 'Escape' && overlay.classList.contains('show')) closePanel();
+    });
 
     /********************
-     Add / Clear buttons
+     Clear / Add behavior
     ********************/
-    document.getElementById('addBtn').addEventListener('click', ()=> {
-      window.location.href = 'add_medicine.html';
-    });
     document.getElementById('clearBtn').addEventListener('click', ()=>{
       if(!confirm('This will clear saved inventory (local). Continue?')) return;
       localStorage.removeItem(STORAGE_KEY);
       refreshUI();
     });
-
-    /********************
-     Highlight active menu
-    ********************/
-    (function highlightActive(){
-      const current = window.location.pathname.split('/').pop() || 'inventory.html';
-      document.querySelectorAll('.nav-list li').forEach(li=>{
-        const a = li.querySelector('a');
-        if(!a) return;
-        const href = a.getAttribute('href');
-        if(href === current) li.classList.add('active');
-        else li.classList.remove('active');
-      });
-    })();
+    document.getElementById('addBtn').addEventListener('click', ()=> window.location.href = 'add_medicine.html');
 
     /********************
      Init
