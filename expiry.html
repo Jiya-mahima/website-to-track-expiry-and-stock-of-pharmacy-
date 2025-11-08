@@ -20,20 +20,7 @@
     body{margin:0;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222}
 
     /* Sidebar */
-    .sidebar {
-      width: var(--sidebar-w);
-      background-color: var(--brand-dark);
-      color: white;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 30px;
-      z-index: 999;
-    }
+    .sidebar { width: var(--sidebar-w); background-color: var(--brand-dark); color: white; position: fixed; top: 0; left: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: 30px; z-index: 999; }
     .sidebar-header { display:flex; flex-direction:column; align-items:center; margin-bottom:25px; }
     .profile-pic { width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:12px; }
     .brand-name { font-size:20px; font-weight:bold; margin-bottom:25px; color:white; }
@@ -164,24 +151,23 @@
     const STORAGE_KEY = 'inventoryData';
     const THRESHOLD_DEFAULT = 60;
 
-    function parseDate(str){
-      if(!str) return null;
-      if(str instanceof Date) return str;
-      const iso = Date.parse(str);
-      if(!isNaN(iso)) return new Date(iso);
-      const mmYYYY = String(str).match(/^(\d{1,2})[\/\-](\d{4})$/);
-      if(mmYYYY) return new Date(parseInt(mmYYYY[2]), parseInt(mmYYYY[1])-1, 0,23,59,59);
+    function parseDate(str) {
+      if (!str) return null;
+      if (str instanceof Date) return str;
+      const d1 = new Date(str);
+      if (!isNaN(d1)) return d1;
+      // fallback dd/mm/yyyy
+      const parts = str.split('/');
+      if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
       return null;
     }
 
     function daysBetween(from,to){ return Math.ceil((to-from)/(1000*60*60*24)); }
 
     function badge(status){
-      switch(status){
-        case 'Expired': return `<span class="badge expired">EXPIRED</span>`;
-        case 'Near Expiry': return `<span class="badge soon">EXPIRING</span>`;
-        default: return `<span class="badge safe">SAFE</span>`;
-      }
+      if(status==='Expired') return `<span class="badge expired">EXPIRED</span>`;
+      if(status==='Near Expiry') return `<span class="badge soon">EXPIRING</span>`;
+      return `<span class="badge safe">SAFE</span>`;
     }
 
     function loadInventory(){
@@ -190,12 +176,10 @@
     }
 
     function computeStatus(row,threshold){
-      const qty = Number(row['Qty'] ?? row['qty'] ?? 0);
-      const expiryRaw = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '';
+      const expiryRaw = row['Expiry Date'] ?? row['expiry'] ?? '';
       const d = parseDate(expiryRaw);
-      const now = new Date();
       if(d){
-        const left = daysBetween(now,d);
+        const left = daysBetween(new Date(),d);
         if(left<0) return {status:'Expired',days:left};
         if(left<=threshold) return {status:'Near Expiry',days:left};
         return {status:'Safe',days:left};
@@ -205,7 +189,8 @@
 
     function render(threshold=THRESHOLD_DEFAULT,searchTerm=''){
       const data=loadInventory();
-      const tbody=document.querySelector('#expiryTable tbody'); tbody.innerHTML='';
+      const tbody=document.querySelector('#expiryTable tbody'); 
+      tbody.innerHTML='';
       let expired=0,soon=0,safe=0;
       const s=searchTerm.toLowerCase().trim();
 
@@ -223,8 +208,8 @@
         else if(st.status==='Near Expiry') soon++;
         else safe++;
 
-        const daysText=st.days===null?'—':(st.days<0?`${Math.abs(st.days)} days ago`:`${st.days} days`);
-        const expiryDisplay=parseDate(row['Expiry Date'])?parseDate(row['Expiry Date']).toLocaleDateString('en-GB',{month:'2-digit',year:'numeric'}):'—';
+        const daysText = st.days===null?'—':(st.days<0?`${Math.abs(st.days)} days ago`:`${st.days} days`);
+        const expiryDisplay = parseDate(row['Expiry Date'])?parseDate(row['Expiry Date']).toLocaleDateString('en-GB',{month:'2-digit',year:'numeric'}):'—';
 
         const tr=document.createElement('tr');
         tr.innerHTML=`
