@@ -77,63 +77,76 @@
     </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'pharma_inventory_v1';
-    const lowStockThreshold = 10;
-    const expiringDays = 90;
+ <script>
+  // Use the same localStorage key as inventory page
+  const STORAGE_KEY = 'inventoryData'; // <-- match inventory.html
+  const lowStockThreshold = 10;
+  const expiringDays = 90;
 
-    function parseExpiryToDate(str){
-      if(!str) return null;
-      if(str instanceof Date) return str;
-      const s = String(str).trim();
-      // MM/YYYY
-      let mmyy = s.match(/^(\d{1,2})[\/\-](\d{4})$/);
-      if(mmyy){ const m = parseInt(mmyy[1],10); const y = parseInt(mmyy[2],10); return new Date(y, m, 0, 23,59,59); }
-      // DD/MM/YYYY
-      let ddmmyyy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-      if(ddmmyyy){ const d = parseInt(ddmmyyy[1],10); const m = parseInt(ddmmyyy[2],10); const y = parseInt(ddmmyyy[3],10); return new Date(y, m-1, d, 23,59,59); }
-      const iso = Date.parse(s);
-      if(!isNaN(iso)) return new Date(iso);
-      return null;
+  function parseExpiryToDate(str){
+    if(!str) return null;
+    if(str instanceof Date) return str;
+    const s = String(str).trim();
+    // MM/YYYY
+    let mmyy = s.match(/^(\d{1,2})[\/\-](\d{4})$/);
+    if(mmyy){ const m = parseInt(mmyy[1],10); const y = parseInt(mmyy[2],10); return new Date(y, m, 0, 23,59,59); }
+    // DD/MM/YYYY
+    let ddmmyyy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if(ddmmyyy){ const d = parseInt(ddmmyyy[1],10); const m = parseInt(ddmmyyy[2],10); const y = parseInt(ddmmyyy[3],10); return new Date(y, m-1, d, 23,59,59); }
+    const iso = Date.parse(s);
+    if(!isNaN(iso)) return new Date(iso);
+    return null;
+  }
+
+  function daysBetween(a,b){ return Math.ceil((b - a)/(1000*60*60*24)); }
+
+  function loadInventory(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return [];
+      return JSON.parse(raw);
+    } catch(e){
+      return [];
     }
+  }
 
-    function daysBetween(a,b){ return Math.ceil((b - a)/(1000*60*60*24)); }
+  function computeStats(){
+    const data = loadInventory();
+    const now = new Date();
+    let total = 0, expiring=0, low=0;
 
-    function loadInventory(){ try{ const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return []; return JSON.parse(raw);}catch(e){ return []; } }
+    data.forEach(r=>{
+      total++;
+      const qty = Number(r['Qty'] ?? r['qty'] ?? 0);
+      if(!isNaN(qty) && qty < lowStockThreshold) low++;
+      const expiryRaw = r['Expiry Date'] ?? r['Expiry'] ?? r['expiry'] ?? '';
+      const d = parseExpiryToDate(expiryRaw);
+      if(d){
+        const diff = daysBetween(now, d);
+        if(diff >= 0 && diff <= expiringDays) expiring++;
+      }
+    });
 
-    function computeStats(){
-      const data = loadInventory();
-      const now = new Date();
-      let total = 0, expiring=0, low=0;
-      data.forEach(r=>{
-        total++;
-        const qty = Number(r['Qty'] ?? r['qty'] ?? 0);
-        if(!isNaN(qty) && qty < lowStockThreshold) low++;
-        const expiryRaw = r['Expiry Date'] ?? r['Expiry'] ?? r['expiry'] ?? '';
-        const d = parseExpiryToDate(expiryRaw);
-        if(d){
-          const diff = daysBetween(now, d);
-          if(diff >= 0 && diff <= expiringDays) expiring++;
-        }
-      });
-      return { total, expiring, low };
-    }
+    return { total, expiring, low };
+  }
 
-    function renderStats(){
-      const s = computeStats();
-      document.getElementById('totalItems').textContent = s.total;
-      document.getElementById('expiringSoon').textContent = s.expiring;
-      document.getElementById('lowStock').textContent = s.low;
-    }
+  function renderStats(){
+    const stats = computeStats();
+    document.getElementById('totalItems').textContent = stats.total;
+    document.getElementById('expiringSoon').textContent = stats.expiring;
+    document.getElementById('lowStock').textContent = stats.low;
+  }
 
-    // refresh whenever the page loads and whenever localStorage changes
-    window.addEventListener('load', renderStats);
-    window.addEventListener('storage', renderStats); // in case other tab updates LS
-    // option: poll every 5s to auto-update (if you prefer)
-    setInterval(renderStats, 5000);
-  </script>
+  // refresh on load
+  window.addEventListener('load', renderStats);
+
+  // optional: poll every 2s in case inventory updates in same tab
+  setInterval(renderStats, 2000);
+</script>
+
 
 </body>
 </html>
+
 
 
