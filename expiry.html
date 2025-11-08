@@ -163,35 +163,29 @@
   if(!str) return null;
   if(str instanceof Date) return str;
 
-  // Try ISO
+  // Remove extra spaces
+  str = str.trim();
+
+  // Try ISO format
   let d = new Date(str);
   if(!isNaN(d)) return d;
 
   // Try dd/mm/yyyy
-  const parts = str.split('/');
+  let parts = str.split('/');
   if(parts.length===3){
-    const day = parseInt(parts[0],10);
-    const month = parseInt(parts[1],10)-1;
-    const year = parseInt(parts[2],10);
-    d = new Date(year, month, day);
+    d = new Date(parts[2], parts[1]-1, parts[0]);
     if(!isNaN(d)) return d;
   }
 
   // Try mm/dd/yyyy
   if(parts.length===3){
-    const month = parseInt(parts[0],10)-1;
-    const day = parseInt(parts[1],10);
-    const year = parseInt(parts[2],10);
-    d = new Date(year, month, day);
+    d = new Date(parts[2], parts[0]-1, parts[1]);
     if(!isNaN(d)) return d;
   }
 
-  // Try timestamp string
-  d = new Date(Number(str));
-  if(!isNaN(d)) return d;
-
   return null;
 }
+
 
 
     function daysBetween(from,to){ return Math.ceil((to-from)/(1000*60*60*24)); }
@@ -308,4 +302,5 @@
   </script>
 </body>
 </html>
+
 
