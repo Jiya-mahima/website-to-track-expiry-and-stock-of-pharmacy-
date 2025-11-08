@@ -156,15 +156,15 @@
 
   <script>
     const STORAGE_KEY = 'inventoryData';
-    const THRESHOLD_DEFAULT = 60;
-    const ROWS_PER_PAGE = 50;
+const THRESHOLD_DEFAULT = 60;
+const ROWS_PER_PAGE = 50;
 
-   function parseDate(str){
+function parseDate(str){
   if(!str) return null;
   if(str instanceof Date) return str;
 
-  // Remove extra spaces
   str = str.trim();
+  if(!str || str==='—') return null;
 
   // Try ISO format
   let d = new Date(str);
@@ -186,121 +186,126 @@
   return null;
 }
 
+function daysBetween(from, to){ 
+  return Math.ceil((to - from)/(1000*60*60*24)); 
+}
 
+function badge(status){
+  if(status==='Expired') return `<span class="badge expired">EXPIRED</span>`;
+  if(status==='Near Expiry') return `<span class="badge soon">EXPIRING</span>`;
+  return `<span class="badge safe">SAFE</span>`;
+}
 
-    function daysBetween(from,to){ return Math.ceil((to-from)/(1000*60*60*24)); }
+function loadInventory(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e){ return []; }
+}
 
-    function badge(status){
-      if(status==='Expired') return `<span class="badge expired">EXPIRED</span>`;
-      if(status==='Near Expiry') return `<span class="badge soon">EXPIRING</span>`;
-      return `<span class="badge safe">SAFE</span>`;
-    }
+function computeStatus(expiryDate, threshold){
+  const d = parseDate(expiryDate);
+  if(!d) return {status:'Safe',days:null};
+  const left = daysBetween(new Date(), d);
+  if(left < 0) return {status:'Expired', days:left};
+  if(left <= threshold) return {status:'Near Expiry', days:left};
+  return {status:'Safe', days:left};
+}
 
-    function loadInventory(){
-      try{ const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; }
-      catch(e){ return []; }
-    }
+let filteredData = [];
+let currentThreshold = THRESHOLD_DEFAULT;
 
-    function computeStatus(expiryDate, threshold){
-      const d = parseDate(expiryDate);
-      if(!d) return {status:'Safe',days:null};
-      const left = daysBetween(new Date(), d);
-      if(left<0) return {status:'Expired', days:left};
-      if(left <= threshold) return {status:'Near Expiry', days:left};
-      return {status:'Safe', days:left};
-    }
+function renderTable(data, page=1, threshold=THRESHOLD_DEFAULT){
+  const tbody = document.querySelector('#expiryTable tbody');
+  tbody.innerHTML = '';
 
-    function renderTable(data, page=1, threshold=THRESHOLD_DEFAULT){
-      const tbody = document.querySelector('#expiryTable tbody');
-      tbody.innerHTML = '';
+  const start = (page-1)*ROWS_PER_PAGE;
+  const end = Math.min(start + ROWS_PER_PAGE, data.length);
+  let expired=0, soon=0, safe=0;
 
-      const start = (page-1)*ROWS_PER_PAGE;
-      const end = Math.min(start + ROWS_PER_PAGE, data.length);
-      let expired=0, soon=0, safe=0;
+  for(let i=start; i<end; i++){
+    const row = data[i];
+    const name = row['Medicine Name'] ?? row['name'] ?? '—';
+    const batch = row['Batch No.'] ?? row['batch'] ?? '—';
+    const category = row['Category'] ?? row['category'] ?? '—';
+    const qty = row['Qty'] ?? row['qty'] ?? 0;
+    const expiryRaw = row['Expiry Date'] ?? row['expiry'] ?? '';
+    const st = computeStatus(expiryRaw, threshold);
 
-      for(let i=start; i<end; i++){
-        const row = data[i];
-        const name=row['Medicine Name']??row['name']??'—';
-        const batch=row['Batch No.']??row['batch']??'—';
-        const category=row['Category']??row['category']??'—';
-        const qty=row['Qty']??row['qty']??0;
-        const expiryRaw = row['Expiry Date'] ?? row['expiry'] ?? '';
-        const st = computeStatus(expiryRaw, threshold);
+    if(st.status==='Expired') expired++;
+    else if(st.status==='Near Expiry') soon++;
+    else safe++;
 
-        if(st.status==='Expired') expired++;
-        else if(st.status==='Near Expiry') soon++;
-        else safe++;
+    const parsedExpiry = parseDate(expiryRaw);
+    const expiryDisplay = parsedExpiry ? parsedExpiry.toLocaleDateString('en-GB') : '—';
+    const daysText = st.days===null ? '—' : (st.days < 0 ? `${Math.abs(st.days)} days ago` : `${st.days} days`);
 
-        const parsedExpiry = parseDate(expiryRaw);
-        const expiryDisplay = parsedExpiry ? parsedExpiry.toLocaleDateString('en-GB') : '—';
-        const daysText = st.days===null?'—':(st.days<0?`${Math.abs(st.days)} days ago`:`${st.days} days`);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td>${batch}</td>
+      <td>${category}</td>
+      <td>${qty}</td>
+      <td>${expiryDisplay}</td>
+      <td>${daysText}</td>
+      <td>${badge(st.status)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${name}</td>
-          <td>${batch}</td>
-          <td>${category}</td>
-          <td>${qty}</td>
-          <td>${expiryDisplay}</td>
-          <td>${daysText}</td>
-          <td>${badge(st.status)}</td>
-        `;
-        tbody.appendChild(tr);
-      }
+  document.getElementById('expiredCount').textContent = expired;
+  document.getElementById('soonCount').textContent = soon;
+  document.getElementById('safeCount').textContent = safe;
+  document.getElementById('totalItems').textContent = data.length;
 
-      document.getElementById('expiredCount').textContent=expired;
-      document.getElementById('soonCount').textContent=soon;
-      document.getElementById('safeCount').textContent=safe;
-      document.getElementById('totalItems').textContent=data.length;
+  renderPagination(data.length, page);
+}
 
-      renderPagination(data.length, page);
-    }
+function renderPagination(totalItems, currentPage){
+  const totalPages = Math.ceil(totalItems / ROWS_PER_PAGE);
+  const container = document.getElementById('pagination');
+  container.innerHTML = '';
+  for(let i=1; i<=totalPages; i++){
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    if(i===currentPage) btn.classList.add('active');
+    btn.addEventListener('click',()=>renderTable(filteredData, i, currentThreshold));
+    container.appendChild(btn);
+  }
+}
 
-    function renderPagination(totalItems, currentPage){
-      const totalPages = Math.ceil(totalItems / ROWS_PER_PAGE);
-      const container = document.getElementById('pagination');
-      container.innerHTML = '';
-      for(let i=1;i<=totalPages;i++){
-        const btn = document.createElement('button');
-        btn.textContent = i;
-        if(i===currentPage) btn.classList.add('active');
-        btn.addEventListener('click',()=>renderTable(filteredData, i, currentThreshold));
-        container.appendChild(btn);
-      }
-    }
+function renderAll(searchTerm=''){
+  const data = loadInventory();
+  const s = searchTerm.toLowerCase().trim();
+  filteredData = data.filter(row=>{
+    const combined = `${row['Medicine Name']??row['name']??''} ${row['Batch No.']??row['batch']??''} ${row['Category']??row['category']??''}`.toLowerCase();
+    return combined.includes(s);
+  });
+  renderTable(filteredData,1,currentThreshold);
+}
 
-    let filteredData = [];
-    let currentThreshold = THRESHOLD_DEFAULT;
+// Initialize UI
+(function initUI(){
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentThreshold = Number(btn.dataset.days);
+      document.getElementById('filterLabel').textContent = currentThreshold+' days';
+      renderAll(document.getElementById('searchInput').value);
+    });
+  });
 
-    function renderAll(searchTerm=''){
-      const data = loadInventory();
-      const s = searchTerm.toLowerCase().trim();
-      filteredData = data.filter(row=>{
-        const combined = `${row['Medicine Name']??row['name']??''} ${row['Batch No.']??row['batch']??''} ${row['Category']??row['category']??''}`.toLowerCase();
-        return combined.includes(s);
-      });
-      renderTable(filteredData,1,currentThreshold);
-    }
+  document.getElementById('searchInput').addEventListener('input', e=>{
+    renderAll(e.target.value);
+  });
 
-    (function initUI(){
-      document.querySelectorAll('.filter-btn').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          currentThreshold = Number(btn.dataset.days);
-          document.getElementById('filterLabel').textContent = currentThreshold+' days';
-          renderAll(document.getElementById('searchInput').value);
-        });
-      });
+  renderAll();
+})();
 
-      document.getElementById('searchInput').addEventListener('input',e=>{
-        renderAll(e.target.value);
-      });
-
-      renderAll();
-    })();
   </script>
 </body>
 </html>
+
 
 
