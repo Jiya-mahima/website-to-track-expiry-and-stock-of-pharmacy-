@@ -3,26 +3,35 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Expiry - PharmaWise</title>
+  <title>Inventory - PharmaWise</title>
 
-  <!-- Font Awesome -->
+  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- SheetJS (XLSX) for Excel/CSV parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
     :root{
       --sidebar-w:300px;
-      --brand-dark:#0b214a;
+      --brand-blue: #0b214a;
       --brand-green:#0b8f75;
       --muted:#f4f6f8;
-      --accent:#fcd34d;
+      --panel-width:460px;
+      --overlay: rgba(2,10,40,0.45);
+      --card-bg: #ffffff;
+      --card-border: #e6eefc;
+      --accent: #2b74d6;
+      --radius: 12px;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222}
 
-    /* Sidebar */
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+
+    /* ---------- Sidebar ---------- */
     .sidebar {
       width: var(--sidebar-w);
-      background-color: var(--brand-dark);
+      background-color: var(--brand-blue);
       color: white;
       position: fixed;
       top: 0;
@@ -31,234 +40,529 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-top: 30px;
-      z-index: 999;
+      padding-top: 28px;
+      z-index: 900;
+      box-shadow: 0 6px 18px rgba(2,15,34,0.12);
     }
-    .sidebar-header { display:flex; flex-direction:column; align-items:center; margin-bottom:25px; }
-    .profile-pic { width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:12px; }
-    .brand-name { font-size:20px; font-weight:bold; margin-bottom:25px; color:white; }
-    .nav-list { list-style:none; padding:0; margin-top:10px; width:100%; }
-    .nav-list li { width:100%; padding:14px 0; text-align:center; cursor:pointer; transition:.3s; border-radius:6px; }
-    .nav-list li a { text-decoration:none; color:white; width:100%; display:block; }
-    .nav-list li:hover { background-color:#19376d; }
-    .nav-list li.active { background-color:#5d8ee9; }
+    .sidebar-header { text-align:center; margin-bottom:20px }
+    .profile-pic { width:74px; height:74px; border-radius:14px; object-fit:cover; border:3px solid rgba(255,255,255,0.06) }
+    .brand-name { font-size:18px; font-weight:700; margin-top:8px; letter-spacing:0.3px }
+    .nav-list { list-style:none; padding:0; margin-top:18px; width:100% }
+    .nav-list li { width:100%; padding:12px 18px; text-align:left; cursor:pointer; transition: all 180ms ease; color:#dbe7ff }
+    .nav-list li a{ color:inherit; text-decoration:none; display:flex; align-items:center; gap:10px }
+    .nav-list li:hover { background: rgba(255,255,255,0.03) }
+    .nav-list li.active { background: rgba(255,255,255,0.06); color:white; font-weight:600; border-left:4px solid var(--accent) }
 
-    /* Main */
-    .main { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); min-height:100vh; display:flex; flex-direction:column; }
-    .topbar{ position: sticky; top:0; z-index:50; background:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 6px rgba(0,0,0,0.06); }
-    .topbar h2{ color:var(--brand-dark); font-size:18px; margin:0 }
-    .search-box{ display:flex; align-items:center; gap:8px; background:#f2f6fb; padding:6px 10px; border-radius:20px; border:1px solid #e6eefc }
-    .search-box input{ border:none; outline:none; background:transparent; padding:6px; width:220px }
+    /* ---------- Main ---------- */
+    .main { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); min-height: 100vh; display:flex; flex-direction:column; }
+    .topbar { background:#fff; display:flex; justify-content:space-between; align-items:center; padding:16px 26px; box-shadow: 0 2px 6px rgba(2,15,34,0.06); z-index:20 }
+    .topbar h2 { color:var(--brand-blue); font-size:18px; margin:0; letter-spacing:0.2px }
+    .search-box { display:flex; align-items:center; gap:8px; background:#f2f6fb; padding:8px 12px; border-radius:999px; border:1px solid #e9f0ff }
+    .search-box input { border:0; outline:0; background:transparent; width:260px; font-size:14px; color:#234; padding:4px }
 
-    .content-area{ padding:22px; }
-    .cards { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:18px }
-    .card { background:#fff; padding:18px; border-radius:10px; min-width:180px; box-shadow:0 6px 18px rgba(8,48,88,0.04); display:flex; flex-direction:column; align-items:flex-start; gap:8px }
-    .card .num { font-size:20px; font-weight:700; color:var(--brand-dark) }
-    .card.expired { border-left:4px solid #c62828 }
-    .card.soon { border-left:4px solid #f39c12 }
-    .card.safe { border-left:4px solid #16a34a }
+    .content-area { padding:22px; }
 
-    .controls { display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap }
-    .filter-btn { padding:8px 12px; border-radius:8px; border:1px solid #e8eef8; background:white; cursor:pointer }
-    .filter-btn.active { background:var(--brand-green); color:white; border-color:transparent }
+    .panel { background:#fff; border-radius:14px; padding:18px; box-shadow: 0 8px 30px rgba(2,15,34,0.06) }
+    .toolbar { display:flex; gap:12px; flex-wrap:wrap; align-items:center }
+    .btn { background:var(--brand-green); color:#fff; padding:9px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:600 }
+    .btn.grey { background:#f0f2f7; color:#123; border:1px solid #e6eefc; font-weight:600 }
+    .file-wrapper { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; background:#f7fafb; border:1px dashed #d9e6ef; font-size:13px; color:#445 }
 
-    .panel { background:#fff; padding:14px; border-radius:10px; box-shadow:0 6px 18px rgba(8,48,88,0.04) }
-    .table-wrap { overflow:auto; max-height:56vh; margin-top:10px }
-    table{ width:100%; border-collapse:collapse; font-size:14px; min-width:900px }
-    th,td{ padding:10px 12px; border-bottom:1px solid #eef3fb; text-align:left }
-    th{ background:#fbfdff; position:sticky; top:0; z-index:2 }
+    /* table */
+    .table-wrap { overflow:auto; max-height:64vh; padding-top:8px; }
+    table { width:100%; border-collapse:collapse; min-width:920px; background:transparent }
+    thead th { position:sticky; top:0; background:linear-gradient(180deg,#fbfdff,#f3f9ff); color:var(--brand-blue); padding:12px 14px; text-align:left; font-size:13px; font-weight:700; border-bottom:1px solid #eef3fb }
+    td { padding:12px 14px; border-bottom:1px solid #f1f6fb; vertical-align:middle; font-size:14px }
+    tbody tr:hover { background: rgba(11,33,74,0.02) }
 
-    .badge { padding:6px 8px; border-radius:6px; font-weight:700; display:inline-block }
-    .badge.expired { background:#ffe6e6; color:#b00000 }
-    .badge.soon { background:#fff4e5; color:#7a5200 }
-    .badge.safe { background:#e9f9ee; color:#0b8f75 }
+    /* status badges */
+    .status-safe{ background:#e7f9ee; color:#137a2f; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
+    .status-low{ background:#fff0f0; color:#a60000; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
+    .status-expiring{ background:#fff7e6; color:#8a6d00; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
+    .status-expired{ background:#fdecea; color:#8a0000; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
+    .status-out{ background:#f5f5f5; color:#666; padding:6px 8px; border-radius:8px; font-weight:700; display:inline-block; font-size:12px }
 
-    .muted { color:#6b7280; font-size:13px }
+    .action-btn { border:0; background:#eef6f9; color:var(--brand-blue); padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:600 }
 
-    @media (max-width:900px){
-      .search-box input{ width:120px }
-      .card { min-width: 140px }
-      table{ font-size:13px }
+    /* ---------- Right side details panel (professional) ---------- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: transparent;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 240ms ease, visibility 240ms ease;
+      z-index: 1100;
+      display:flex;
+      justify-content:flex-end;
+      align-items:stretch;
+    }
+    .overlay.show { background: var(--overlay); opacity:1; visibility:visible; }
+
+    .detail-panel {
+      width: var(--panel-width);
+      max-width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg,#ffffff,#fbfdff);
+      box-shadow: -20px 0 40px rgba(2,15,34,0.12);
+      transform: translateX(115%);
+      transition: transform 340ms cubic-bezier(.2,.9,.2,1);
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      border-left: 1px solid rgba(11,33,74,0.04);
+      border-top-left-radius: var(--radius);
+      border-bottom-left-radius: var(--radius);
+    }
+    .overlay.show .detail-panel { transform: translateX(0); }
+
+    .detail-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:6px; border-bottom:1px solid #eef6ff }
+    .detail-title { display:flex; gap:12px; align-items:center }
+    .detail-title img { width:46px; height:46px; border-radius:10px; object-fit:cover; box-shadow: 0 6px 18px rgba(11,33,74,0.06) }
+    .detail-title h3 { margin:0; color:var(--brand-blue); font-size:16px; line-height:1; }
+    .detail-sub { font-size:12px; color:#6b7280; margin-top:2px }
+
+    .detail-body { overflow:auto; padding-top:8px; display:flex; flex-direction:column; gap:14px; }
+
+    /* info row card */
+    .info-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:12px; box-shadow: 0 6px 18px rgba(2,15,34,0.04); }
+    .info-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px 12px; }
+    .info-item { display:flex; flex-direction:column; gap:6px; }
+    .info-label { color:#6b7280; font-size:12px; }
+    .info-value { color:var(--brand-blue); font-weight:700; font-size:14px; }
+
+    .desc { color:#344054; font-size:14px; background:#fbfdff; padding:10px; border-radius:8px; border:1px dashed #eef6ff }
+
+    .panel-footer { margin-top:auto; display:flex; gap:12px; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid #f1f6fb }
+    .close-panel { background:transparent; border:0; color:#475569; font-size:16px; cursor:pointer }
+
+    /* small responsive */
+    @media (max-width: 960px){
+      .detail-panel{ width: 90%; max-width:420px }
+      table{ min-width:700px }
+    }
+    @media (max-width: 600px){
+      .sidebar { display:none }
+      .main { margin-left:0; width:100% }
+      .detail-panel { width: 100% }
+      table{ min-width:0 }
     }
   </style>
 </head>
 <body>
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <img src="image/logo.jpg" alt="logo" class="profile-pic" />
       <div class="brand-name">PharmaTrack</div>
     </div>
+
     <ul class="nav-list">
-      <li><a href="home.html">Home</a></li>
-      <li><a href="inventory.html">Inventory</a></li>
-      <li><a href="add_medicine.html">Add Medicines</a></li>
-      <li class="active"><a href="expiry.html">Expiry</a></li>
-      <li><a href="profile.html">Profile</a></li>
+      <li><a href="home.html"><i class="fa fa-home"></i> Home</a></li>
+      <li class="active"><a href="inventory.html"><i class="fa fa-capsules"></i> Inventory</a></li>
+      <li><a href="add_medicine.html"><i class="fa fa-plus-square"></i> Add Medicines</a></li>
+      <li><a href="expiry.html"><i class="fa fa-calendar"></i> Expiry</a></li>
+      <li><a href="profile.html"><i class="fa fa-user"></i> Profile</a></li>
     </ul>
   </aside>
 
+  <!-- Main -->
   <div class="main">
     <div class="topbar">
-      <h2>Expiry Management</h2>
-      <div class="search-box">
-        <input id="searchInput" placeholder="Search name, batch, category..." />
-        <button id="searchBtn" title="Search"><i class="fa fa-search"></i></button>
+      <div style="display:flex;flex-direction:column">
+        <h2>Pharmacy Inventory Management</h2>
+        <small style="color:#6b7280;margin-top:6px">Manage stock, expiry and cost — click Details to inspect an item</small>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="search-box">
+          <input id="globalSearch" placeholder="Search inventory..." />
+          <i class="fa fa-search" style="color:#6b7280"></i>
+        </div>
+        <button class="btn" id="addBtn">Add Medicine</button>
       </div>
     </div>
 
     <div class="content-area">
-      <div class="cards">
-        <div class="card expired">
-          <div class="muted">Expired</div>
-          <div class="num" id="expiredCount">0</div>
-          <div class="muted">Items past expiry date</div>
-        </div>
-        <div class="card soon">
-          <div class="muted">Expiring Soon</div>
-          <div class="num" id="soonCount">0</div>
-          <div class="muted">Items within selected days</div>
-        </div>
-        <div class="card safe">
-          <div class="muted">Safe</div>
-          <div class="num" id="safeCount">0</div>
-          <div class="muted">Items with healthy expiry</div>
-        </div>
-      </div>
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+          <div class="toolbar">
+            <label class="file-wrapper" title="Upload Excel/CSV">
+              <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" />
+              <span>Upload Excel / CSV</span>
+            </label>
+            <button class="btn grey" id="clearBtn">Clear Inventory</button>
+          </div>
 
-      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-        <div class="controls">
-          <button class="filter-btn" data-days="30">30 days</button>
-          <button class="filter-btn active" data-days="60">60 days</button>
-          <button class="filter-btn" data-days="90">90 days</button>
-          <div style="padding:8px 10px;border-radius:8px;background:#f6f9fc;border:1px solid #e6eefc;color:#334; font-size:13px">
-            Current filter: <strong id="filterLabel">60 days</strong>
+          <div style="font-size:13px;color:#555;display:flex;align-items:center;gap:8px">
+            <i class="fa fa-info-circle" style="color:#9fb0e8"></i>
+            <div>Upload with headers: <strong>Medicine Name, Batch No., Category, Qty, Expiry Date, Cost Price, Description</strong></div>
           </div>
         </div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <div class="muted">Total items in inventory: <strong id="totalItems">0</strong></div>
-        </div>
-      </div>
 
-      <div class="panel">
-        <div class="table-wrap">
-          <table id="expiryTable">
+        <div class="table-wrap" id="tableWrap" role="region" aria-label="Inventory table">
+          <table id="inventoryTable" aria-live="polite">
             <thead>
               <tr>
                 <th>Medicine Name</th>
                 <th>Batch No.</th>
                 <th>Category</th>
                 <th>Qty</th>
-                <th>Expiry Date</th>
-                <th>Days Left</th>
+                <th>Expiry</th>
                 <th>Status</th>
+                <th style="text-align:center">Action</th>
               </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+              <!-- rows injected here -->
+            </tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'inventoryData';
-    const THRESHOLD_DEFAULT = 60;
+  <!-- Overlay + Right-side Detail Panel (professional) -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <aside class="detail-panel" role="dialog" aria-labelledby="detailTitle" aria-modal="true">
+      <div class="detail-header">
+        <div class="detail-title">
+          <img id="detailImage" src="image/logo.jpg" alt="medicine" />
+          <div>
+            <h3 id="detailTitle">Medicine Details</h3>
+            <div id="detailSmall" class="detail-sub">Batch • Category • Status</div>
+          </div>
+        </div>
+        <div>
+          <button id="closePanel" class="close-panel" title="Close panel"><i class="fa fa-times"></i></button>
+        </div>
+      </div>
 
-    function parseDate(str){
+      <div class="detail-body">
+        <div class="info-card" id="overviewCard">
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Medicine Name</div>
+              <div id="panelName" class="info-value">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Category</div>
+              <div id="panelCategory" class="info-value">—</div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-label">Expiry Date</div>
+              <div id="panelExpiry" class="info-value">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Quantity</div>
+              <div id="panelQty" class="info-value">—</div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-label">Cost Price</div>
+              <div id="panelCost" class="info-value">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Status</div>
+              <div id="panelStatus" class="info-value">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-label">Description</div>
+          <div id="panelDesc" class="desc">—</div>
+        </div>
+
+        <!-- extra area if you want to show supplier or meta info later -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1; min-width:150px" class="info-card">
+            <div class="info-label">Added On</div>
+            <div id="panelAdded" class="info-value">—</div>
+          </div>
+          <div style="flex:1; min-width:150px" class="info-card">
+            <div class="info-label">Storage</div>
+            <div id="panelLocation" class="info-value">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div style="color:#6b7280;font-size:13px">Viewing details — read-only</div>
+        <div><button id="closeBtnBottom" class="close-panel">Close</button></div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    /********************
+     Config & storage
+    ********************/
+    const STORAGE_KEY = 'inventoryData';
+
+    /********************
+     Helpers: parse/format
+    ********************/
+    function escapeHtml(t){ if(t===undefined||t===null) return ''; return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    function parseExpiryToDate(str){
       if(!str) return null;
       if(str instanceof Date) return str;
+      str = String(str).trim();
+      const mmYYYY = str.match(/^(\d{1,2})[\/\-](\d{4})$/);
+      if(mmYYYY){
+        const m = parseInt(mmYYYY[1],10); const y = parseInt(mmYYYY[2],10);
+        return new Date(y, m, 0, 23,59,59);
+      }
       const iso = Date.parse(str);
       if(!isNaN(iso)) return new Date(iso);
-      const mmYYYY = String(str).match(/^(\d{1,2})[\/\-](\d{4})$/);
-      if(mmYYYY) return new Date(parseInt(mmYYYY[2]), parseInt(mmYYYY[1])-1, 0,23,59,59);
       return null;
     }
 
-    function daysBetween(from,to){ return Math.ceil((to-from)/(1000*60*60*24)); }
-
-    function badge(status){
-      switch(status){
-        case 'Expired': return `<span class="badge expired">EXPIRED</span>`;
-        case 'Near Expiry': return `<span class="badge soon">EXPIRING</span>`;
-        default: return `<span class="badge safe">SAFE</span>`;
-      }
+    function formatExpiryForDisplay(str){
+      const d = parseExpiryToDate(str);
+      if(!d) return (str || '—');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      return `${mm}/${yyyy}`;
     }
 
-    function loadInventory(){
-      try{ const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; }
-      catch(e){ return []; }
-    }
-
-    function computeStatus(row,threshold){
-      const qty = Number(row['Qty'] ?? row['qty'] ?? 0);
-      const expiryRaw = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '';
-      const d = parseDate(expiryRaw);
+    function computeStatusFromRow(row){
+      const qtyRaw = row['Qty'] ?? row['qty'] ?? row['Quantity'] ?? row['quantity'] ?? 0;
+      const qty = Number(qtyRaw ?? 0);
+      const expiryStr = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? row['expiry_date'] ?? '';
+      const d = parseExpiryToDate(expiryStr);
       const now = new Date();
+      if(!isNaN(qty) && qty === 0) return 'Out of Stock';
+      if(!isNaN(qty) && qty < 10) return 'Low Stock';
       if(d){
-        const left = daysBetween(now,d);
-        if(left<0) return {status:'Expired',days:left};
-        if(left<=threshold) return {status:'Near Expiry',days:left};
-        return {status:'Safe',days:left};
+        const diffDays = Math.ceil((d - now) / (1000*60*60*24));
+        if(diffDays < 0) return 'Expired';
+        if(diffDays <= 30) return 'Near Expiry';
       }
-      return {status:'Safe',days:null};
+      return 'In Stock';
     }
 
-    function render(threshold=THRESHOLD_DEFAULT,searchTerm=''){
-      const data=loadInventory();
-      const tbody=document.querySelector('#expiryTable tbody'); tbody.innerHTML='';
-      let expired=0,soon=0,safe=0;
-      const s=searchTerm.toLowerCase().trim();
+    function statusToBadgeHTML(s){
+      if(!s) return '';
+      if(s === 'Low Stock') return `<span class="status-low">${s}</span>`;
+      if(s === 'Near Expiry') return `<span class="status-expiring">${s}</span>`;
+      if(s === 'Expired') return `<span class="status-expired">${s}</span>`;
+      if(s === 'Out of Stock') return `<span class="status-out">${s}</span>`;
+      return `<span class="status-safe">${s}</span>`;
+    }
 
-      data.forEach(row=>{
-        const name=row['Medicine Name']??row['name']??'—';
-        const batch=row['Batch No.']??row['batch']??'—';
-        const category=row['Category']??row['category']??'—';
-        const qty=row['Qty']??row['qty']??0;
+    /********************
+     Storage: load / save
+    ********************/
+    function loadInventory(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return [];
+        return JSON.parse(raw);
+      }catch(e){
+        console.warn('load error', e);
+        return [];
+      }
+    }
+    function saveInventory(arr){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    }
 
-        const st=computeStatus(row,threshold);
-        const combined=`${name} ${batch} ${category}`.toLowerCase();
-        if(s && !combined.includes(s)) return;
+    /********************
+     Render table
+    ********************/
+    function normalizeFieldValue(row, keys){ for(const k of keys) if(row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k]; return ''; }
 
-        if(st.status==='Expired') expired++;
-        else if(st.status==='Near Expiry') soon++;
-        else safe++;
+    function rowToTr(row, idx){
+      const name = normalizeFieldValue(row, ['Medicine Name','medicineName','name','Medicine']);
+      const batch = normalizeFieldValue(row, ['Batch No.','Batch No','Batch','batch','batchNo']);
+      const category = normalizeFieldValue(row, ['Category','category']);
+      const qty = normalizeFieldValue(row, ['Qty','qty','Quantity','quantity']) || 0;
+      const expiryRaw = normalizeFieldValue(row, ['Expiry Date','Expiry','expiry','expiry_date']);
+      const expiry = formatExpiryForDisplay(expiryRaw);
+      const status = computeStatusFromRow(row);
 
-        const daysText=st.days===null?'—':(st.days<0?`${Math.abs(st.days)} days ago`:`${st.days} days`);
-        const expiryDisplay=parseDate(row['Expiry Date'])?parseDate(row['Expiry Date']).toLocaleDateString('en-GB',{month:'2-digit',year:'numeric'}):'—';
+      const tr = document.createElement('tr');
+      tr.dataset.index = idx;
+      tr.innerHTML = `
+        <td style="width:220px">${escapeHtml(name)}</td>
+        <td>${escapeHtml(batch)}</td>
+        <td>${escapeHtml(category)}</td>
+        <td>${escapeHtml(qty)}</td>
+        <td>${escapeHtml(expiry)}</td>
+        <td>${statusToBadgeHTML(status)}</td>
+        <td style="text-align:center"><button class="action-btn details-btn" data-index="${idx}"><i class="fa fa-info-circle" style="margin-right:6px"></i>Details</button></td>
+      `;
+      return tr;
+    }
 
-        const tr=document.createElement('tr');
-        tr.innerHTML=`
-          <td>${name}</td>
-          <td>${batch}</td>
-          <td>${category}</td>
-          <td>${qty}</td>
-          <td>${expiryDisplay}</td>
-          <td>${daysText}</td>
-          <td>${badge(st.status)}</td>
-        `;
-        tbody.appendChild(tr);
+    function renderTable(data){
+      const tbody = document.querySelector('#inventoryTable tbody');
+      tbody.innerHTML = '';
+      if(!data || data.length === 0){
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#666;padding:18px">No Data Available</td></tr>`;
+        return;
+      }
+      data.forEach((row, i) => tbody.appendChild(rowToTr(row, i)));
+      attachDetailButtons();
+    }
+
+    function refreshUI(){ const data = loadInventory(); renderTable(data); }
+
+    /********************
+     Search filter
+    ********************/
+    document.getElementById('globalSearch').addEventListener('input', (e)=>{
+      const text = (e.target.value||'').toLowerCase().trim();
+      const rows = document.querySelectorAll('#inventoryTable tbody tr');
+      rows.forEach(r=>{
+        r.style.display = r.innerText.toLowerCase().includes(text) ? '' : 'none';
       });
+    });
 
-      document.getElementById('expiredCount').textContent=expired;
-      document.getElementById('soonCount').textContent=soon;
-      document.getElementById('safeCount').textContent=safe;
-      document.getElementById('totalItems').textContent=data.length;
-    }
+    /********************
+     File upload (Excel/CSV)
+    ********************/
+    document.getElementById('excelFile').addEventListener('change', function(e){
+      const f = e.target.files[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = function(evt){
+        const data = evt.target.result;
+        let workbook;
+        try {
+          workbook = XLSX.read(data, {type: 'binary'});
+        } catch(err){
+          alert('Failed to parse file. Make sure it is a valid Excel or CSV file.');
+          return;
+        }
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet, {raw:false, defval:''});
+        if(!json || !json.length){
+          alert('No rows found in the uploaded sheet.');
+          return;
+        }
 
-    (function initUI(){
-      let threshold = THRESHOLD_DEFAULT;
-      document.querySelectorAll('.filter-btn').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          threshold = Number(btn.dataset.days);
-          document.getElementById('filterLabel').textContent = threshold+' days';
-          render(threshold,document.getElementById('searchInput').value);
+        // Normalize column names to keep things consistent
+        const normalized = json.map(r=>{
+          return {
+            'Medicine Name': r['Medicine Name'] ?? r['Medicine'] ?? r['medicine name'] ?? r['medicine'] ?? r['name'] ?? '',
+            'Batch No.': r['Batch No.'] ?? r['Batch'] ?? r['batch'] ?? '',
+            'Category': r['Category'] ?? r['category'] ?? '',
+            'Qty': r['Qty'] ?? r['Quantity'] ?? r['qty'] ?? 0,
+            'Expiry Date': r['Expiry Date'] ?? r['Expiry'] ?? r['expiry'] ?? r['ExpiryDate'] ?? '',
+            'Cost Price': r['Cost Price'] ?? r['Cost'] ?? r['cost'] ?? r['price'] ?? '',
+            'Description': r['Description'] ?? r['description'] ?? r['Notes'] ?? ''
+          };
         });
+
+        // Save and render
+        saveInventory(normalized);
+        renderTable(normalized);
+        e.target.value = '';
+        alert('File uploaded and inventory replaced successfully.');
+      };
+      reader.readAsBinaryString(f);
+    });
+
+    /********************
+     Attach detail buttons -> open right panel
+    ********************/
+    const overlay = document.getElementById('overlay');
+    const detailPanel = document.querySelector('.detail-panel');
+
+    function attachDetailButtons(){
+      document.querySelectorAll('.details-btn').forEach(btn=>{
+        btn.removeEventListener('click', onDetailsClick);
+        btn.addEventListener('click', onDetailsClick);
       });
-      document.getElementById('searchInput').addEventListener('input',e=>render(threshold,e.target.value));
-      render();
-    })();
+    }
+
+    // panel elements
+    const detailTitle = document.getElementById('detailTitle');
+    const detailSmall = document.getElementById('detailSmall');
+    const detailImage = document.getElementById('detailImage');
+    const panelName = document.getElementById('panelName');
+    const panelCategory = document.getElementById('panelCategory');
+    const panelExpiry = document.getElementById('panelExpiry');
+    const panelQty = document.getElementById('panelQty');
+    const panelCost = document.getElementById('panelCost');
+    const panelStatus = document.getElementById('panelStatus');
+    const panelDesc = document.getElementById('panelDesc');
+    const panelAdded = document.getElementById('panelAdded');
+    const panelLocation = document.getElementById('panelLocation');
+
+    function onDetailsClick(e){
+      const idx = Number(e.currentTarget.dataset.index);
+      const data = loadInventory();
+      const item = data[idx] ?? {};
+      // populate fields (selected ones + helpful context)
+      const name = normalizeFieldValue(item, ['Medicine Name','medicineName','name','Medicine']);
+      const batch = normalizeFieldValue(item, ['Batch No.','Batch','batch','batchNo']);
+      const category = normalizeFieldValue(item, ['Category','category']);
+      const qty = normalizeFieldValue(item, ['Qty','qty','Quantity','quantity']) || 0;
+      const expiryRaw = normalizeFieldValue(item, ['Expiry Date','Expiry','expiry','expiry_date']);
+      const expiry = formatExpiryForDisplay(expiryRaw);
+      const cost = normalizeFieldValue(item, ['Cost Price','Cost','cost','price']) || '';
+      const description = normalizeFieldValue(item, ['Description','description','Notes','notes']) || '';
+      const status = computeStatusFromRow(item);
+
+      // header
+      detailTitle.textContent = name || 'Medicine Details';
+      detailSmall.textContent = `${escapeHtml(batch)} • ${escapeHtml(category)} • ${status}`;
+      // image: keep default logo if none provided
+      detailImage.src = item.image || 'image/logo.jpg';
+
+      // body
+      panelName.textContent = name || '—';
+      panelCategory.textContent = category || '—';
+      panelExpiry.textContent = expiry || '—';
+      panelQty.textContent = String(qty);
+      panelCost.textContent = cost ? (escapeHtml(cost) + (typeof cost === 'number' ? '' : '')) : '—';
+      panelStatus.innerHTML = statusToBadgeHTML(status) || '—';
+      panelDesc.textContent = description || '—';
+      panelAdded.textContent = item.addedDate ?? item.added_on ?? '—';
+      panelLocation.textContent = item.location ?? item.storage ?? '—';
+
+      // open panel
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+    }
+
+    // close handlers
+    const closePanelBtn = document.getElementById('closePanel');
+    const closeBtnBottom = document.getElementById('closeBtnBottom');
+    function closePanel(){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+    }
+    closePanelBtn.addEventListener('click', closePanel);
+    closeBtnBottom.addEventListener('click', closePanel);
+    overlay.addEventListener('click', (ev)=>{
+      if(ev.target === overlay) closePanel();
+    });
+    window.addEventListener('keydown', (ev)=>{
+      if(ev.key === 'Escape' && overlay.classList.contains('show')) closePanel();
+    });
+
+    /********************
+     Clear / Add behavior
+    ********************/
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      if(!confirm('This will clear saved inventory (local). Continue?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      refreshUI();
+    });
+    document.getElementById('addBtn').addEventListener('click', ()=> window.location.href = 'add_medicine.html');
+
+    /********************
+     Init
+    ********************/
+    window.addEventListener('load', ()=> refreshUI() );
   </script>
 </body>
 </html>
