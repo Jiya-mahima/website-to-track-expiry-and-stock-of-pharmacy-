@@ -35,7 +35,7 @@
       color: white;
       position: fixed;
       top: 0;
-       left:0;
+      left: 0;
       height: 100vh;
       display: flex;
       flex-direction: column;
@@ -159,11 +159,11 @@
     </div>
 
     <ul class="nav-list">
-      <li><a href="home.html"></i> Home</a></li>
-      <li class="active"><a href="inventory.html"> Inventory</a></li>
-      <li><a href="add_medicine.html">Add Medicines</a></li>
-      <li><a href="expiry.html">Expiry</a></li>
-      <li><a href="profile.html">Profile</a></li>
+      <li><a href="home.html"><i class="fa fa-home"></i> Home</a></li>
+      <li class="active"><a href="inventory.html"><i class="fa fa-capsules"></i> Inventory</a></li>
+      <li><a href="add_medicine.html"><i class="fa fa-plus-square"></i> Add Medicines</a></li>
+      <li><a href="expiry.html"><i class="fa fa-calendar"></i> Expiry</a></li>
+      <li><a href="profile.html"><i class="fa fa-user"></i> Profile</a></li>
     </ul>
   </aside>
 
@@ -271,7 +271,22 @@
           </div>
         </div>
 
-      
+        <div class="info-card">
+          <div class="info-label">Description</div>
+          <div id="panelDesc" class="desc">—</div>
+        </div>
+
+        <!-- extra area if you want to show supplier or meta info later -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1; min-width:150px" class="info-card">
+            <div class="info-label">Added On</div>
+            <div id="panelAdded" class="info-value">—</div>
+          </div>
+          <div style="flex:1; min-width:150px" class="info-card">
+            <div class="info-label">Storage</div>
+            <div id="panelLocation" class="info-value">—</div>
+          </div>
+        </div>
       </div>
 
       <div class="panel-footer">
@@ -551,8 +566,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
