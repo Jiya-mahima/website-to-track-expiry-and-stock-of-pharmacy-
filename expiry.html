@@ -236,166 +236,158 @@
   </div>
 
   <script>
-    // KEY used by inventory page
-    const STORAGE_KEY = 'pharma_inventory_v1';
+   <script>
+  // -------------------- CONFIG --------------------
+  const STORAGE_KEY = 'pharma_inventory_v1'; // make sure this matches your inventory storage key
+  const THRESHOLD_DAYS_DEFAULT = 60; // default expiry threshold
 
-    // helpers
-    function parseExpiryToDate(str){
-      if(!str) return null;
-      if(str instanceof Date) return str;
-      // if user stored MM/YYYY (like 01/2026)
-      const mmYYYY = String(str).match(/^(\d{1,2})[\/\-](\d{4})$/);
-      if(mmYYYY){
-        const m = parseInt(mmYYYY[1],10);
-        const y = parseInt(mmYYYY[2],10);
-        return new Date(y, m, 0, 23,59,59); // last day of month
-      }
-      const iso = Date.parse(str);
-      if(!isNaN(iso)) return new Date(iso);
-      return null;
+  // -------------------- HELPERS --------------------
+  function parseDate(str) {
+    if (!str) return null;
+    if (str instanceof Date) return str;
+    const iso = Date.parse(str);
+    if (!isNaN(iso)) return new Date(iso);
+
+    // try MM/YYYY
+    const mmYYYY = String(str).match(/^(\d{1,2})[\/\-](\d{4})$/);
+    if (mmYYYY) {
+      const m = parseInt(mmYYYY[1], 10);
+      const y = parseInt(mmYYYY[2], 10);
+      return new Date(y, m, 0, 23, 59, 59); // last day of month
     }
 
-    function daysBetween(from, to){
-      const diff = to - from;
-      return Math.ceil(diff / (1000*60*60*24));
+    return null;
+  }
+
+  function daysBetween(from, to) {
+    return Math.ceil((to - from) / (1000 * 60 * 60 * 24));
+  }
+
+  function badge(status) {
+    if (!status) return `<span class="badge safe">SAFE</span>`;
+    switch (status.toUpperCase()) {
+      case 'EXPIRED': return `<span class="badge expired">EXPIRED</span>`;
+      case 'EXPIRING': return `<span class="badge soon">EXPIRING</span>`;
+      case 'LOW STOCK': return `<span class="badge expired">LOW STOCK</span>`;
+      default: return `<span class="badge safe">${status}</span>`;
     }
+  }
 
-    function computeRowStatus(row, thresholdDays){
-      const qty = Number(row['Qty'] ?? row['qty'] ?? row['Quantity'] ?? 0);
-      const expiryRaw = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '';
-      const d = parseExpiryToDate(expiryRaw);
-      const now = new Date();
-      if(d){
-        const daysLeft = daysBetween(now, d);
-        if(daysLeft < 0) return {status:'EXPIRED', daysLeft};
-        if(daysLeft <= thresholdDays) return {status:'EXPIRING', daysLeft};
-        return {status:'SAFE', daysLeft};
-      } else {
-        // unknown expiry -> treat as safe unless qty low
-        if(!isNaN(qty) && qty <= 20) return {status:'LOW STOCK', daysLeft: null};
-        return {status:'UNKNOWN', daysLeft: null};
-      }
+  function escapeHtml(s) {
+    if (s === undefined || s === null) return '';
+    return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+  }
+
+  function computeStatus(row, thresholdDays) {
+    const qtyKeys = ['Qty', 'qty', 'Quantity'];
+    const expiryKeys = ['Expiry Date', 'expiry', 'Expiry'];
+    
+    const qty = qtyKeys.map(k=>row[k]).find(v=>v!==undefined) || 0;
+    const expiryRaw = expiryKeys.map(k=>row[k]).find(v=>v!==undefined) || '';
+    
+    const d = parseDate(expiryRaw);
+    const now = new Date();
+    if (d) {
+      const daysLeft = daysBetween(now, d);
+      if (daysLeft < 0) return { status: 'EXPIRED', daysLeft };
+      if (daysLeft <= thresholdDays) return { status: 'EXPIRING', daysLeft };
+      return { status: 'SAFE', daysLeft };
+    } else {
+      if (!isNaN(qty) && qty <= 20) return { status: 'LOW STOCK', daysLeft: null };
+      return { status: 'UNKNOWN', daysLeft: null };
     }
+  }
 
-    function formatExpiry(str){
-      const d = parseExpiryToDate(str);
-      if(!d) return str || '';
-      const mm = String(d.getMonth()+1).padStart(2,'0');
-      const yyyy = d.getFullYear();
-      return mm + '/' + yyyy;
+  // -------------------- LOAD DATA --------------------
+  function loadInventory() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw);
+    } catch(e) {
+      console.warn(e);
+      return [];
     }
+  }
 
-    function badgeForStatus(s){
-      if(!s) return '<span class="badge safe">SAFE</span>';
-      if(s === 'EXPIRED') return '<span class="badge expired">EXPIRED</span>';
-      if(s === 'EXPIRING') return '<span class="badge soon">EXPIRING</span>';
-      if(s === 'LOW STOCK') return '<span class="badge expired">LOW STOCK</span>';
-      return '<span class="badge safe">' + s + '</span>';
-    }
+  // -------------------- RENDER --------------------
+  function render(thresholdDays=THRESHOLD_DAYS_DEFAULT, searchTerm='') {
+    const data = loadInventory();
+    const tbody = document.querySelector('#expiryTable tbody');
+    tbody.innerHTML = '';
 
-    // load data from localStorage
-    function loadInventory(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return [];
-        return JSON.parse(raw);
-      }catch(e){ console.warn(e); return []; }
-    }
+    let expiredCount = 0, soonCount = 0, safeCount = 0;
+    const now = new Date();
+    const s = (searchTerm||'').toLowerCase().trim();
 
-    // render table & cards
-    function render(thresholdDays = 60, searchTerm = ''){
-      const data = loadInventory();
-      const tbody = document.querySelector('#expiryTable tbody');
-      tbody.innerHTML = '';
+    data.forEach(row => {
+      // Dynamically detect main fields
+      const name = row['Medicine Name'] ?? row['name'] ?? '—';
+      const batch = row['Batch No.'] ?? row['batch'] ?? '—';
+      const category = row['Category'] ?? row['category'] ?? '—';
+      const qty = row['Qty'] ?? row['qty'] ?? row['Quantity'] ?? 0;
+      const expiryRaw = row['Expiry Date'] ?? row['expiry'] ?? row['Expiry'] ?? '';
+      
+      const st = computeStatus(row, thresholdDays);
 
-      let total = data.length;
-      let expiredCount = 0;
-      let soonCount = 0;
-      let safeCount = 0;
+      // Search filter
+      const combined = `${name} ${batch} ${category}`.toLowerCase();
+      if (s && !combined.includes(s)) return;
 
-      const now = new Date();
-      const s = (searchTerm||'').toLowerCase().trim();
+      // Update counts
+      if (st.status === 'EXPIRED') expiredCount++;
+      else if (st.status === 'EXPIRING') soonCount++;
+      else safeCount++;
 
-      data.forEach(row=>{
-        const name = (row['Medicine Name'] ?? row['name'] ?? '').toString();
-        const batch = (row['Batch No.'] ?? row['batch'] ?? '').toString();
-        const category = (row['Category'] ?? row['category'] ?? '').toString();
-        const qty = row['Qty'] ?? row['qty'] ?? row['Quantity'] ?? 0;
-        const expiryRaw = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '';
-        const d = parseExpiryToDate(expiryRaw);
-        const daysLeft = d ? daysBetween(now, d) : null;
+      const daysText = st.daysLeft === null ? '—' : (st.daysLeft < 0 ? `${Math.abs(st.daysLeft)} days ago` : `${st.daysLeft} days`);
+      const expiryDisplay = parseDate(expiryRaw) ? parseDate(expiryRaw).toLocaleDateString('en-GB', { month:'2-digit', year:'numeric' }) : '—';
 
-        // compute status using thresholdDays
-        const st = computeRowStatus(row, thresholdDays);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(name)}</td>
+        <td>${escapeHtml(batch)}</td>
+        <td>${escapeHtml(category)}</td>
+        <td>${escapeHtml(qty)}</td>
+        <td>${escapeHtml(expiryDisplay)}</td>
+        <td>${escapeHtml(daysText)}</td>
+        <td>${badge(st.status)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
 
-        // filter by search
-        const combined = (name + ' ' + batch + ' ' + category).toLowerCase();
-        if(s && !combined.includes(s)) return;
+    // Update summary cards
+    document.getElementById('expiredCount').textContent = expiredCount;
+    document.getElementById('soonCount').textContent = soonCount;
+    document.getElementById('safeCount').textContent = safeCount;
+    document.getElementById('totalItems').textContent = data.length;
+  }
 
-        // count categories
-        if(st.status === 'EXPIRED') expiredCount++;
-        else if(st.status === 'EXPIRING') soonCount++;
-        else safeCount++;
+  // -------------------- INIT UI --------------------
+  (function initUI(){
+    let selectedDays = THRESHOLD_DAYS_DEFAULT;
+    const filterButtons = document.querySelectorAll('.filter-btn');
 
-        const daysText = daysLeft === null ? '—' : (daysLeft < 0 ? (Math.abs(daysLeft) + ' days ago') : (daysLeft + ' days'));
-        const expiryDisplay = formatExpiry(expiryRaw);
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${escapeHtml(name)}</td>
-          <td>${escapeHtml(batch)}</td>
-          <td>${escapeHtml(category)}</td>
-          <td>${escapeHtml(qty)}</td>
-          <td>${escapeHtml(expiryDisplay)}</td>
-          <td>${escapeHtml(daysText)}</td>
-          <td>${badgeForStatus(st.status)}</td>
-        `;
-        tbody.appendChild(tr);
+    filterButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        filterButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedDays = Number(btn.dataset.days || THRESHOLD_DAYS_DEFAULT);
+        document.getElementById('filterLabel').textContent = selectedDays + ' days';
+        render(selectedDays, document.getElementById('searchInput').value);
       });
+    });
 
-      document.getElementById('expiredCount').textContent = expiredCount;
-      document.getElementById('soonCount').textContent = soonCount;
-      document.getElementById('safeCount').textContent = safeCount;
-      document.getElementById('totalItems').textContent = total;
-    }
+    document.getElementById('searchInput').addEventListener('input', (e)=>{
+      render(selectedDays, e.target.value);
+    });
 
-    function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+    render(selectedDays, '');
+  })();
+</script>
 
-    // UI wiring
-    (function initUI(){
-      let selectedDays = 60;
-      const filterButtons = document.querySelectorAll('.filter-btn');
-      filterButtons.forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          filterButtons.forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          selectedDays = Number(btn.getAttribute('data-days') || 60);
-          document.getElementById('filterLabel').textContent = selectedDays + ' days';
-          render(selectedDays, document.getElementById('searchInput').value);
-        });
-      });
-
-      // search
-      document.getElementById('searchInput').addEventListener('input', (e)=>{
-        render(selectedDays, e.target.value);
-      });
-
-      // highlight active menu (ensure expiry active)
-      (function highlightActive(){
-        const current = window.location.pathname.split('/').pop() || 'expiry.html';
-        document.querySelectorAll('.nav-list li').forEach(li=>{
-          const a = li.querySelector('a');
-          if(!a) return;
-          if(a.getAttribute('href') === current) li.classList.add('active');
-          else li.classList.remove('active');
-        });
-      })();
-
-      // initial render
-      render(selectedDays, '');
-    })();
   </script>
 </body>
 </html>
+
 
 
