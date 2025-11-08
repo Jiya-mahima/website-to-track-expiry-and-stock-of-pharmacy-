@@ -159,21 +159,40 @@
     const THRESHOLD_DEFAULT = 60;
     const ROWS_PER_PAGE = 50;
 
-    function parseDate(str) {
-      if (!str) return null;
-      if (str instanceof Date) return str;
-      const d = new Date(str);
-      if (!isNaN(d)) return d;
-      const parts = str.split('/');
-      if (parts.length === 3) {
-        const day = parseInt(parts[0],10);
-        const month = parseInt(parts[1],10)-1;
-        const year = parseInt(parts[2],10);
-        const parsed = new Date(year, month, day);
-        if (!isNaN(parsed)) return parsed;
-      }
-      return null;
-    }
+   function parseDate(str){
+  if(!str) return null;
+  if(str instanceof Date) return str;
+
+  // Try ISO
+  let d = new Date(str);
+  if(!isNaN(d)) return d;
+
+  // Try dd/mm/yyyy
+  const parts = str.split('/');
+  if(parts.length===3){
+    const day = parseInt(parts[0],10);
+    const month = parseInt(parts[1],10)-1;
+    const year = parseInt(parts[2],10);
+    d = new Date(year, month, day);
+    if(!isNaN(d)) return d;
+  }
+
+  // Try mm/dd/yyyy
+  if(parts.length===3){
+    const month = parseInt(parts[0],10)-1;
+    const day = parseInt(parts[1],10);
+    const year = parseInt(parts[2],10);
+    d = new Date(year, month, day);
+    if(!isNaN(d)) return d;
+  }
+
+  // Try timestamp string
+  d = new Date(Number(str));
+  if(!isNaN(d)) return d;
+
+  return null;
+}
+
 
     function daysBetween(from,to){ return Math.ceil((to-from)/(1000*60*60*24)); }
 
@@ -289,3 +308,4 @@
   </script>
 </body>
 </html>
+
