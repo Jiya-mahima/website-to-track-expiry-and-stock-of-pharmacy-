@@ -29,7 +29,7 @@
     body{margin:0;font-family:Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
 
     /* ---------- Sidebar ---------- */
-   .sidebar {
+ .sidebar {
   width: var(--sidebar-w);
   background-color: var(--brand-blue);
   color: white;
@@ -40,23 +40,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Center logo + nav vertically */
-  justify-content: center; 
+  justify-content: flex-start; /* <-- do NOT center vertically */
+  padding-top: 28px; /* add spacing from top */
   z-index: 900;
   box-shadow: 0 6px 18px rgba(2,15,34,0.12);
 }
 
 .sidebar-header {
   text-align: center;
-  margin-bottom: 28px; /* space between logo and nav */
+  margin-bottom: 20px;
 }
 
 .nav-list {
   list-style: none;
   padding: 0;
   width: 100%;
-  text-align: center; /* center items horizontally */
+  text-align: center;
+  margin-top: 18px;
 }
+
 
 .nav-list li {
   padding: 12px 0; /* vertical padding */
@@ -586,6 +588,7 @@
   </script>
 </body>
 </html>
+
 
 
 
