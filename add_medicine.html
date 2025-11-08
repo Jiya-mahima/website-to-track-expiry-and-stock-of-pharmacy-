@@ -123,10 +123,15 @@
             alert('Medicine Stock Added Successfully! Redirecting to inventory Page.');
             window.location.href = 'inventory.html';
         });
+      let stock = JSON.parse(localStorage.getItem('inventoryData')) || [];
+stock.push(formData);
+localStorage.setItem('inventoryData', JSON.stringify(stock));
+
     </script>
 
   </div>
 </body>
 </html>
+
 
 
