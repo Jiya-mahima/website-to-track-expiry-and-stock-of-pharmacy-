@@ -9,292 +9,287 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    /* ---------- Theme: Vibrant Modern (Purple / Teal / Bright Blue) ---------- */
+    /* ---------- Dark Premium Dashboard (matching your sample) ---------- */
     :root{
-      --bg: #0f1724;
-      --panel: #0b1220;
+      --bg: #0b1220;
+      --panel: #0f1724;
       --muted: #9aa7c7;
-      --accent1: #7c3aed; /* purple */
-      --accent2: #06b6d4; /* teal */
-      --accent3: #2563eb; /* bright blue */
-      --card-grad: linear-gradient(135deg,var(--accent1),var(--accent2));
-      --glass: rgba(255,255,255,0.03);
-      --glass-2: rgba(255,255,255,0.02);
-      --success: #10b981;
-      --danger: #ef4444;
+      --card-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      --glass-border: rgba(255,255,255,0.03);
       --radius: 14px;
-      --shadow: 0 10px 30px rgba(2,6,23,0.6);
-      --blur: 10px;
-      --glass-border: rgba(255,255,255,0.04);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(44, 37, 79, 0.45), transparent),
-                  radial-gradient(900px 500px at 85% 90%, rgba(6,184,212,0.06), transparent),
-                  var(--bg);
-      color: #e6eefb;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+      --shadow-1: 0 10px 30px rgba(2,6,23,0.6);
+      --accentA: linear-gradient(135deg,#7c3aed 0%, #5b21b6 100%); /* purple */
+      --accentB: linear-gradient(135deg,#ff7a7a 0%, #ffb677 100%); /* orange */
+      --accentC: linear-gradient(135deg,#ffd166 0%, #ff6bcb 100%); /* pink/yellow */
+      --accentD: linear-gradient(135deg,#06b6d4 0%, #2563eb 100%); /* teal/blue */
+      --card-gap: 22px;
+      color-scheme: dark;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
 
-    /* Sidebar */
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; margin:0; background: linear-gradient(180deg,#071026 0%, #0b1220 100%); color: #e6eefb; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+
+    /* Layout */
+    .layout {
+      display:flex;
+      min-height:100vh;
+    }
+
+    /* Sidebar (left) -- simplified to match look */
     .sidebar {
-      width: 260px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-      position: fixed;
-      left: 24px;
-      top: 24px;
-      bottom: 24px;
-      border-radius: 20px;
-      padding: 20px;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(var(--blur));
+      width:260px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:28px 18px;
+      border-right: 1px solid rgba(255,255,255,0.02);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
     }
     .brand {
-      display:flex; gap:12px; align-items:center; margin-bottom:18px;
+      display:flex; align-items:center; gap:12px;
     }
-    .brand img{ width:48px; height:48px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.06) }
-    .brand h1{ font-size:18px; margin:0; letter-spacing:0.2px; color:#fff }
-    .nav-list{ margin-top:12px; padding:0; list-style:none }
-    .nav-list a{ display:block; padding:10px 12px; text-decoration:none; color:var(--muted); border-radius:10px; margin-bottom:6px }
-    .nav-list a.active, .nav-list a:hover{ color:#fff; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); }
+    .brand img { width:56px;height:56px;border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.04) }
+    .brand h1 { margin:0; font-size:18px; color:#fff; letter-spacing:0.2px; }
+    .nav { margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+    .nav a { color:var(--muted); text-decoration:none; padding:12px 10px; border-radius:10px; display:block; font-size:15px; }
+    .nav a.active, .nav a:hover { color:#fff; background: rgba(255,255,255,0.02); }
 
-    /* Main area */
-    .container {
-      margin-left: 320px;
-      padding: 36px;
+    /* Main content */
+    .main {
+      flex:1;
+      padding:30px;
     }
 
-    .topbar {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:26px;
+    .header {
+      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:26px;
     }
-    .topbar h2{ margin:0; font-size:20px; color:#fff }
-    .topbar .sub { color:var(--muted); font-size:13px }
+    .header h2 { margin:0; font-size:20px; color:#fff; }
+    .header .sub { color:var(--muted); font-size:13px; }
 
-    /* Cards grid */
+    /* Card grid to mirror your screenshot proportions */
     .cards {
       display:grid;
-      grid-template-columns: repeat(3, minmax(200px,1fr));
-      gap:20px;
-      margin-bottom:28px;
+      grid-template-columns: repeat(3, minmax(220px,1fr));
+      gap: var(--card-gap);
+      align-items:stretch;
     }
+
+    /* Card style */
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius: var(--radius);
+      background: var(--card-bg);
+      border-radius: 12px;
       padding:18px;
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 8px 30px rgba(2,6,23,0.55);
       display:flex;
+      gap:18px;
       align-items:center;
-      gap:14px;
-      overflow:hidden;
-      transform: translateY(8px);
-      opacity: 0;
-      animation: floatIn 600ms ease forwards;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms;
+      opacity:0; transform: translateY(10px);
+      animation: fadeUp 420ms ease forwards;
     }
-    .card .icon {
-      width:56px; height:56px; border-radius:12px;
+    .card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.7); }
+
+    @keyframes fadeUp {
+      to { opacity:1; transform: translateY(0); }
+    }
+
+    /* Icon box style (square gradient) */
+    .icon-box {
+      width:64px; height:64px; border-radius:12px;
       display:flex; align-items:center; justify-content:center;
-      color:#fff; font-size:20px; flex:0 0 56px;
-      background: var(--card-grad);
-      box-shadow: 0 6px 18px rgba(124,58,237,0.14);
-      position:relative; overflow:hidden;
+      color:#fff; font-size:20px; flex:0 0 64px;
+      box-shadow: 0 8px 20px rgba(2,6,23,0.5);
     }
+
+    /* Content area */
     .card .content { flex:1; }
     .card .title { font-size:13px; color:var(--muted); margin:0 0 6px 0; }
-    .card .value { font-size:28px; font-weight:700; margin:0; color:#fff; }
-    .card .small { font-size:12px; color:var(--muted); margin-top:6px }
+    .card .value { font-size:26px; font-weight:700; margin:0; color:#fff; }
+    .card .desc { font-size:12px; color:var(--muted); margin-top:6px; }
 
-    /* Special color accents for each card */
-    .card.total .icon { background: linear-gradient(135deg, var(--accent3), #7c3aed); }
-    .card.expiring .icon { background: linear-gradient(135deg, #ff7a7a, #ffb677); }
-    .card.low .icon { background: linear-gradient(135deg, #ffd166, #ff6bcb); }
+    /* Colors per card (left icon box) */
+    .card.total .icon-box { background: var(--accentD); }
+    .card.expiring .icon-box { background: var(--accentB); }
+    .card.low .icon-box { background: var(--accentC); }
 
-    /* subtle hover lift */
-    .card:hover { transform: translateY(0); box-shadow: 0 18px 40px rgba(2,6,23,0.7); }
+    /* small icon inside */
+    .icon-box i { font-size:22px; }
 
-    @keyframes floatIn {
-      from { transform: translateY(18px); opacity: 0 }
-      to { transform: translateY(0); opacity: 1 }
-    }
+    /* make cards appear with slight delay */
+    .card:nth-child(1){ animation-delay: 0.06s; }
+    .card:nth-child(2){ animation-delay: 0.12s; }
+    .card:nth-child(3){ animation-delay: 0.18s; }
 
-    /* responsive */
+    /* Responsive */
     @media (max-width:1000px){
-      .cards { grid-template-columns: repeat(2,1fr) }
-      .container { padding:20px; margin-left: 20px; margin-right:20px; }
-      .sidebar { display:none }
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      .sidebar { display:none; }
+      .main { padding:20px; }
     }
     @media (max-width:640px){
-      .cards { grid-template-columns: 1fr }
+      .cards { grid-template-columns: 1fr; }
     }
 
     /* small footer note */
-    .note { color:var(--muted); font-size:13px; margin-top:8px; }
+    .note { color:var(--muted); font-size:12px; margin-top:14px; }
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <aside class="sidebar" aria-hidden="false">
-    <div class="brand">
-      <img src="image/logo.jpg" alt="logo" />
-      <div>
-        <h1>PharmaTrack</h1>
-        <div style="font-size:12px;color:var(--muted)">Inventory Dashboard</div>
-      </div>
-    </div>
-
-    <nav class="nav-list" aria-label="Main navigation">
-      <a href="home.html" class="active"><i class="fa fa-house"></i> &nbsp; Home</a>
-      <a href="inventory.html"><i class="fa fa-boxes"></i> &nbsp; Inventory</a>
-      <a href="add_medicine.html"><i class="fa fa-plus-square"></i> &nbsp; Add Medicines</a>
-      <a href="expiry.html"><i class="fa fa-calendar-days"></i> &nbsp; Expiry</a>
-      <a href="profile.html"><i class="fa fa-user"></i> &nbsp; Profile</a>
-    </nav>
-  </aside>
-
-  <!-- Main -->
-  <main class="container" role="main">
-    <div class="topbar">
-      <div>
-        <h2>Welcome back</h2>
-        <div class="sub">Overview of your pharmacy inventory</div>
-      </div>
-      <div class="sub">Last sync: <span id="lastSync">—</span></div>
-    </div>
-
-    <section class="cards" aria-live="polite">
-      <div class="card total" title="Total medicine rows">
-        <div class="icon"><i class="fa fa-tablets"></i></div>
-        <div class="content">
-          <div class="title">Total Items</div>
-          <div class="value" id="totalItems">0</div>
-          <div class="small">Total medicine rows in inventory</div>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-hidden="false">
+      <div class="brand">
+        <img src="image/logo.jpg" alt="logo" />
+        <div>
+          <h1>PharmaTrack</h1>
+          <div style="color:var(--muted); font-size:12px">Inventory Dashboard</div>
         </div>
       </div>
 
-      <div class="card expiring" title="Expiring soon within 90 days">
-        <div class="icon"><i class="fa fa-hourglass-half"></i></div>
-        <div class="content">
-          <div class="title">Expiring Soon (90 days)</div>
-          <div class="value" id="expiringSoon">0</div>
-          <div class="small">Items whose expiry falls within 90 days</div>
+      <nav class="nav" aria-label="Main">
+        <a href="home.html" class="active"><i class="fa fa-house"></i> &nbsp; Home</a>
+        <a href="inventory.html"><i class="fa fa-boxes"></i> &nbsp; Inventory</a>
+        <a href="add_medicine.html"><i class="fa fa-plus-square"></i> &nbsp; Add Medicines</a>
+        <a href="expiry.html"><i class="fa fa-calendar-days"></i> &nbsp; Expiry</a>
+        <a href="profile.html"><i class="fa fa-user"></i> &nbsp; Profile</a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main" role="main">
+      <div class="header">
+        <div>
+          <h2>Welcome back</h2>
+          <div class="sub">Overview of your pharmacy inventory</div>
         </div>
+        <div class="sub">Last sync: <span id="lastSync">—</span></div>
       </div>
 
-      <div class="card low" title="Low stock items">
-        <div class="icon"><i class="fa fa-exclamation-triangle"></i></div>
-        <div class="content">
-          <div class="title">Low Stock Items (&lt; 10)</div>
-          <div class="value" id="lowStock">0</div>
-          <div class="small">Items with quantity &lt; 10</div>
+      <section class="cards" aria-live="polite">
+        <!-- Total Items -->
+        <div class="card total" role="article" aria-label="Total Items">
+          <div class="icon-box"><i class="fa fa-tablets"></i></div>
+          <div class="content">
+            <div class="title">Total Items</div>
+            <div class="value" id="totalItems">0</div>
+            <div class="desc">Total medicine rows in inventory</div>
+          </div>
         </div>
-      </div>
-    </section>
 
-    <div class="note">Data source: <strong>localStorage &nbsp;→ &nbsp; key: <code>medicineStock</code></strong></div>
-  </main>
+        <!-- Expiring Soon -->
+        <div class="card expiring" role="article" aria-label="Expiring Soon">
+          <div class="icon-box"><i class="fa fa-hourglass-half"></i></div>
+          <div class="content">
+            <div class="title">Expiring Soon (90 days)</div>
+            <div class="value" id="expiringSoon">0</div>
+            <div class="desc">Items whose expiry falls within 90 days</div>
+          </div>
+        </div>
+
+        <!-- Low Stock -->
+        <div class="card low" role="article" aria-label="Low Stock">
+          <div class="icon-box"><i class="fa fa-exclamation-triangle"></i></div>
+          <div class="content">
+            <div class="title">Low Stock Items (&lt; 10)</div>
+            <div class="value" id="lowStock">0</div>
+            <div class="desc">Items with quantity &lt; 10</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="note">Data source: <strong>localStorage → key: <code>medicineStock</code></strong></div>
+    </main>
+  </div>
 
   <script>
-    /*******************************
-     * Dashboard script
-     * Reads localStorage key: medicineStock (JSON array)
-     * Expects objects similar to:
-     * { "Medicine Name":"Benadryl", "Batch No.":"BATCH1583", "Category":"Powder", "Qty":"19", "Expiry Date":"2027-12-07", ... }
-     *******************************/
-
+    /*****************************************
+     * Dashboard behavior
+     * - Reads localStorage[medicineStock] (JSON array)
+     * - Updates three cards: total, expiring (90d), low stock (<10)
+     * - Listens for storage events + polls as fallback
+     *****************************************/
     const STORAGE_KEY = 'medicineStock';
     const EXPIRING_DAYS = 90;
     const LOW_STOCK_THRESHOLD = 10;
     const POLL_MS = 3000;
 
-    // robust expiry parser
-    function parseExpiryToDate(str){
-      if(!str && str !== 0) return null;
+    // Robust expiry parser supporting multiple formats
+    function parseExpiryToDate(str) {
+      if (!str && str !== 0) return null;
       str = String(str).trim();
-      if(!str) return null;
+      if (!str) return null;
 
-      // 1) YYYY-MM-DD or YYYY/MM/DD or ISO
-      if(/^\d{4}-\d{2}-\d{2}$/.test(str) || /^\d{4}\/\d{2}\/\d{2}$/.test(str)){
+      // ISO-like YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
         const d = new Date(str);
         return isNaN(d) ? null : d;
       }
-
-      // 2) YYYY-MM  -> treat as last day of month
-      if(/^\d{4}-\d{2}$/.test(str)){
-        const [y,m] = str.split('-').map(Number);
+      // YYYY-MM (treat as last day of month)
+      if (/^\d{4}-\d{2}$/.test(str)) {
+        const [y, m] = str.split('-').map(Number);
         return new Date(y, m, 0, 23,59,59);
       }
-
-      // 3) MM/YYYY or M/YYYY -> treat as last day of month
-      if(/^\d{1,2}\/\d{4}$/.test(str)){
+      // MM/YYYY or M/YYYY -> last day
+      if (/^\d{1,2}\/\d{4}$/.test(str)) {
         const [mm, yyyy] = str.split('/').map(Number);
         return new Date(yyyy, mm, 0, 23,59,59);
       }
-
-      // 4) DD/MM/YYYY or D/M/YYYY
-      if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)){
+      // DD/MM/YYYY
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) {
         const [d,m,y] = str.split('/').map(Number);
         return new Date(y, m-1, d, 23,59,59);
       }
-
-      // 5) other: try Date constructor
+      // fallback: try Date
       const d = new Date(str);
       return isNaN(d) ? null : d;
     }
 
-    function daysBetween(from, to){
-      return Math.ceil((to - from) / (1000*60*60*24));
+    function daysBetween(from, to) {
+      return Math.ceil((to - from) / (1000 * 60 * 60 * 24));
     }
 
-    // read and parse storage. returns array of normalized rows
-    function loadInventoryRows(){
+    // Read and normalize rows from localStorage
+    function loadInventory() {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return [];
-
+      if (!raw) return [];
       try {
         const arr = JSON.parse(raw);
-        if(!Array.isArray(arr)) return [];
-        // normalize fields and ensure numeric qty
+        if (!Array.isArray(arr)) return [];
         return arr.map(item => {
+          // support both "Medicine Name" style and short keys
           const name = item['Medicine Name'] ?? item['name'] ?? item['medicine'] ?? '—';
           const batch = item['Batch No.'] ?? item['Batch No'] ?? item['batch'] ?? item['batchNo'] ?? '—';
           const category = item['Category'] ?? item['category'] ?? '—';
-          const qty = Number(item['Qty'] ?? item['qty'] ?? item['quantity'] ?? 0);
+          const qtyRaw = item['Qty'] ?? item['qty'] ?? item['quantity'] ?? 0;
+          const qty = Number(String(qtyRaw).replace(/[^0-9.-]/g,'') || 0);
           const expiry = item['Expiry Date'] ?? item['Expiry'] ?? item['expiry'] ?? item['expiryDate'] ?? '';
           return { name, batch, category, qty: Number.isFinite(qty) ? qty : 0, expiryRaw: expiry };
         });
-      } catch(e){
+      } catch (e) {
         console.warn('Failed to parse medicineStock', e);
         return [];
       }
     }
 
-    // compute stats
-    function computeStats(rows){
+    function computeStats(rows) {
       const now = new Date();
       let total = 0, expiring = 0, low = 0;
       rows.forEach(r => {
         total++;
-        if(!isNaN(r.qty) && r.qty < LOW_STOCK_THRESHOLD) low++;
+        if (!isNaN(r.qty) && r.qty < LOW_STOCK_THRESHOLD) low++;
         const d = parseExpiryToDate(r.expiryRaw);
-        if(d){
+        if (d) {
           const diff = daysBetween(now, d);
-          if(diff >= 0 && diff <= EXPIRING_DAYS) expiring++;
+          if (diff >= 0 && diff <= EXPIRING_DAYS) expiring++;
         }
       });
       return { total, expiring, low };
     }
 
-    // update UI
-    function render(){
-      const rows = loadInventoryRows();
+    function render() {
+      const rows = loadInventory();
       const s = computeStats(rows);
       document.getElementById('totalItems').textContent = s.total;
       document.getElementById('expiringSoon').textContent = s.expiring;
@@ -302,15 +297,17 @@
       document.getElementById('lastSync').textContent = new Date().toLocaleString();
     }
 
-    // listen to storage events from other tabs
-    window.addEventListener('storage', (e) => {
-      if(e.key === STORAGE_KEY) render();
-    });
-
     // initial render
     window.addEventListener('load', render);
 
-    // poll fallback in case same-tab updates don't fire storage events
+    // listen for storage changes in other tabs
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) {
+        render();
+      }
+    });
+
+    // poll fallback (useful when same tab code updates localStorage)
     setInterval(render, POLL_MS);
   </script>
 </body>
