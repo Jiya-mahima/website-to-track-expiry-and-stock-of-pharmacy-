@@ -127,25 +127,7 @@
 stock.push(formData);
 localStorage.setItem('inventoryData', JSON.stringify(stock));
 
-document.getElementById('addStockForm').addEventListener('submit', function(event) {
-    event.preventDefault();
 
-    const formData = {
-        "Medicine Name": document.getElementById('medicineName').value,
-        "Batch No.": document.getElementById('batchNumber').value,
-        "Category": document.getElementById('category').value,
-        "Expiry Date": document.getElementById('expiryDate').value + "-01", // add day for valid date
-        "Qty": Number(document.getElementById('quantity').value)
-    };
-
-    // ✅ Save to the SAME storage key used by inventory & expiry pages
-    let stock = JSON.parse(localStorage.getItem('inventoryData')) || [];
-    stock.push(formData);
-    localStorage.setItem('inventoryData', JSON.stringify(stock));
-
-    alert('✅ Medicine Added Successfully!\nRedirecting to Inventory Page...');
-    window.location.href = 'inventory.html';
-});
 
 
     </script>
@@ -153,6 +135,7 @@ document.getElementById('addStockForm').addEventListener('submit', function(even
   </div>
 </body>
 </html>
+
 
 
 
