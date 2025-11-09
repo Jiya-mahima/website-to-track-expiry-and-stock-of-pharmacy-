@@ -10,45 +10,20 @@
 
   <style>
     /* ---------- Dark Premium Dashboard (matching your sample) ---------- */
-    :root{
-      --bg: #0b1220;
-      --panel: #0f1724;
-      --muted: #9aa7c7;
-      --card-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      --glass-border: rgba(255,255,255,0.03);
-      --radius: 14px;
-      --shadow-1: 0 10px 30px rgba(2,6,23,0.6);
-      --accentA: linear-gradient(135deg,#7c3aed 0%, #5b21b6 100%); /* purple */
-      --accentB: linear-gradient(135deg,#ff7a7a 0%, #ffb677 100%); /* orange */
-      --accentC: linear-gradient(135deg,#ffd166 0%, #ff6bcb 100%); /* pink/yellow */
-      --accentD: linear-gradient(135deg,#06b6d4 0%, #2563eb 100%); /* teal/blue */
-      --card-gap: 22px;
-      color-scheme: dark;
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-
-    *{ box-sizing: border-box; }
-    html,body{ display: flex;
+    body {
+      display: flex;
       min-height: 100vh;
       background-color: #f4f6f8;
-      color: #333; }
-
-    /* Layout */
-    .layout {
-      display:flex;
-      min-height:100vh;
+      color: #333;
     }
 
-    /* Sidebar (left) -- simplified to match look */
-    .sidebar {
-      width:260px;
-      background-color: #0b214a;
-      padding:28px 18px;
-      border-right: 1px solid rgba(255,255,255,0.02);
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-       color: white;
+    /* Sidebar */
+/* ======= Sidebar Common Style (Use on all pages) ======= */
+
+.sidebar {
+  width: 300px;
+  background-color: #0b214a;
+  color: white;
   position: fixed;
   top: 0;
   left: 0;
@@ -58,193 +33,300 @@
   align-items: center;
   padding-top: 30px;
   z-index: 999 !important;
-    }
-    .brand {
-      display:flex; align-items:center; gap:12px;
-       display: flex;
+}
+
+/* Profile & Brand */
+.sidebar-header {
+  display: flex;
   flex-direction: column;
- 
+  align-items: center;
   margin-bottom: 25px;
-    }
-    .brand img {width: 90px;
+}
+
+.sidebar .profile-pic {
+  width: 90px;
   height: 90px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 12px; }
-    .brand h1 {  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.brand-name {
+  font-size: 20px;
   font-weight: bold;
   margin-bottom: 25px;
-  color: white;}
-   .nav-list li {
-  padding: 12px 20px;
+  color: white;
+}
+
+/* Menu Items */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.nav-list li {
+  width: 100%;
+  padding: 14px 0;
+  text-align: center;
   cursor: pointer;
   transition: 0.3s;
+  border-radius: 6px;
 }
 
 .nav-list li a {
-  color: #fff;
   text-decoration: none;
+  color: white;
+  width: 100%;
   display: block;
 }
 
-/* Hover Effect */
+/* Hover & Active */
 .nav-list li:hover {
   background-color: #19376d;
 }
 
-/* Active Page Highlight */
 .nav-list li.active {
   background-color: #5d8ee9;
 }
 
-.nav-list li.active a {
-  color: #fff;
+/* ===== Main Page (Right Content) ===== */
+.main {
+  margin-left: 300px;     /* Equal to sidebar width */
+  width: calc(100% - 300px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Sidebar Menu Styling */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    padding: 12px 15px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+ul li a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+}
+
+/* Hover Effect */
+ul li:hover {
+    background: #5d8ee9;
+    color: white;
+}
+
+/* Active Menu Item */
+ul li.active {
+    background: #a6bfee;
+    color: white;
+}
+
+
+.brand-name {
+  margin-left: -15px; /* move it left (try -10px to -20px based on your preference) */
+  text-align: left; /* ensures text aligns properly */
 }
 
     /* Main content */
     .main {
-      flex:1;
-      padding:30px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
-    .header {
-      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:26px;
+    .topbar {
+      background-color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: fixed;
+      width: 79%;
+      
     }
-    .header h2 { margin:0; font-size:20px; color:#fff; }
-    .header .sub { color:var(--muted); font-size:13px; }
 
-    /* Card grid to mirror your screenshot proportions */
+    .topbar h2 {
+      color: #0b214a;
+      font-size: 20px;
+    }
+
+    
+    .search-box {
+      display: flex;
+      align-items: center;
+      background-color: #f0f2f7;
+      border-radius: 25px;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      background: none;
+      padding: 8px 12px;
+      width: 200px;
+      font-size: 14px;
+    }
+
+    .search-box button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 8px;
+      color: #1f3c88;
+      font-size: 16px;
+    }
+
+    .search-box button:hover {
+      color: #365dcf;
+    }
+
+
+    /* Dashboard image + overlay cards */
+  .dashboard-wrapper {
+  flex: 1;
+  margin-top: 70px; /* Height of the topbar */
+}
+
+.dashboard-content {
+  background-image: url('../image/j.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
     .cards {
-      display:grid;
-      grid-template-columns: repeat(3, minmax(220px,1fr));
-      gap: var(--card-gap);
-      align-items:stretch;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 20px;
     }
 
-    /* Card style */
     .card {
-      background: var(--card-bg);
+      background: rgba(255,255,255,0.9);
       border-radius: 12px;
-      padding:18px;
-      display:flex;
-      gap:18px;
-      align-items:center;
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-      transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms;
-      opacity:0; transform: translateY(10px);
-      animation: fadeUp 420ms ease forwards;
-    }
-    .card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.7); }
-
-    @keyframes fadeUp {
-      to { opacity:1; transform: translateY(0); }
+      padding: 20px;
+      min-width: 180px;
+      text-align: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
     }
 
-    /* Icon box style (square gradient) */
-    .icon-box {
-      width:64px; height:64px; border-radius:12px;
-      display:flex; align-items:center; justify-content:center;
-      color:#fff; font-size:20px; flex:0 0 64px;
-      box-shadow: 0 8px 20px rgba(2,6,23,0.5);
+    .card:hover {
+      transform: translateY(-5px);
     }
 
-    /* Content area */
-    .card .content { flex:1; }
-    .card .title { font-size:13px; color:var(--muted); margin:0 0 6px 0; }
-    .card .value { font-size:26px; font-weight:700; margin:0; color:#fff; }
-    .card .desc { font-size:12px; color:var(--muted); margin-top:6px; }
-
-    /* Colors per card (left icon box) */
-    .card.total .icon-box { background: var(--accentD); }
-    .card.expiring .icon-box { background: var(--accentB); }
-    .card.low .icon-box { background: var(--accentC); }
-
-    /* small icon inside */
-    .icon-box i { font-size:22px; }
-
-    /* make cards appear with slight delay */
-    .card:nth-child(1){ animation-delay: 0.06s; }
-    .card:nth-child(2){ animation-delay: 0.12s; }
-    .card:nth-child(3){ animation-delay: 0.18s; }
-
-    /* Responsive */
-    @media (max-width:1000px){
-      .cards { grid-template-columns: repeat(2, 1fr); }
-      .sidebar { display:none; }
-      .main { padding:20px; }
-    }
-    @media (max-width:640px){
-      .cards { grid-template-columns: 1fr; }
+    .card h3 {
+      color: #0b214a;
+      font-size: 18px;
+      margin-bottom: 8px;
     }
 
+    .card p {
+      font-size: 14px;
+      color: #444;
+    }
+
+
+    @media (max-width: 768px) {
+      .cards {
+        flex-direction: column;
+      }
+      .sidebar {
+        display: none;
+      }
+    }
     /* small footer note */
     .note { color:var(--muted); font-size:12px; margin-top:14px; }
   </style>
 </head>
 <body>
-  <div class="layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" aria-hidden="false">
-      <div class="brand">
-        <img src="image/logo.jpg" alt="logo" />
-        <div>
-          <h1>PharmaTrack</h1>
-          <div style="color:var(--muted); font-size:12px">Inventory Dashboard</div>
-        </div>
-      </div>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="image/logo.jpg" alt="Pharmacy Logo" class="profile-pic">
+      <h2 class="brand-name">PharmaTrack</h2>
+    </div>
 
-      
       <ul class="nav-list">
-  <li class="active"><a href="home.html">Home</a></li>
-  <li><a href="inventory.html">Inventory</a></li>
-  <li><a href="add_medicine.html">Add Medicines</a></li>
-  <li><a href="expiry.html">Expiry</a></li>
-  <li><a href="profile.html">Profile</a></li>
-</ul>
+     <li class="active">
+ 
+  <a href="home.html" >Home</a>
+</li>
 
-    </aside>
+<li >
+ 
+  <a href="inventory.html" >Inventory</a>
+</li>
 
-    <!-- Main -->
-    <main class="main" role="main">
-      <div class="header">
-        <div>
-          <h2>Welcome back</h2>
-          <div class="sub">Overview of your pharmacy inventory</div>
+<li >
+
+  <a href="add_medicine.html" >Add Medicines</a>
+</li>
+
+<li>
+ 
+  <a href="expiry.html">Expiry</a>
+</li>
+
+<li>
+
+  <a href="profile.html">Profile</a>
+</li>
+
+    </ul>
+
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="topbar">
+      <h2>Pharmacy Inventory Management</h2>
+      
+    </div>
+
+ <div class="dashboard-wrapper">
+  
+    <div class="dashboard-content">
+      <div class="cards">
+        <div class="card">
+          <h3>Total Items</h3>
+          <p id="totalItems">0</p>
         </div>
-        <div class="sub">Last sync: <span id="lastSync">—</span></div>
+        <div class="card">
+          <h3>Expiring Soon (90 days)</h3>
+          <p id="expiringSoon">0</p>
+        </div>
+        <div class="card">
+          <h3>Low Stock Items (&lt; 10)</h3>
+          <p id="lowStock">0</p>
+        </div>
       </div>
-
-      <section class="cards" aria-live="polite">
-        <!-- Total Items -->
-        <div class="card total" role="article" aria-label="Total Items">
-          <div class="icon-box"><i class="fa fa-tablets"></i></div>
-          <div class="content">
-            <div class="title">Total Items</div>
-            <div class="value" id="totalItems">0</div>
-            <div class="desc">Total medicine rows in inventory</div>
-          </div>
-        </div>
-
-        <!-- Expiring Soon -->
-        <div class="card expiring" role="article" aria-label="Expiring Soon">
-          <div class="icon-box"><i class="fa fa-hourglass-half"></i></div>
-          <div class="content">
-            <div class="title">Expiring Soon (90 days)</div>
-            <div class="value" id="expiringSoon">0</div>
-            <div class="desc">Items whose expiry falls within 90 days</div>
-          </div>
-        </div>
-
-        <!-- Low Stock -->
-        <div class="card low" role="article" aria-label="Low Stock">
-          <div class="icon-box"><i class="fa fa-exclamation-triangle"></i></div>
-          <div class="content">
-            <div class="title">Low Stock Items (&lt; 10)</div>
-            <div class="value" id="lowStock">0</div>
-            <div class="desc">Items with quantity &lt; 10</div>
-          </div>
-        </div>
+    </div>
+  </div>
       </section>
 
       <div class="note">Data source: <strong>localStorage → key: <code>medicineStock</code></strong></div>
@@ -360,6 +442,7 @@
   </script>
 </body>
 </html>
+
 
 
 
