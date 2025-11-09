@@ -14,105 +14,30 @@
       --brand-dark:#0b214a;
       --brand-green:#0b8f75;
       --muted:#f4f6f8;
+      --accent:#fcd34d;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:var(--muted);color:#222}
 
-    /* ---------------- Sidebar (matches other pages) ---------------- */
-   .sidebar {
-  width: 300px;
-  background-color: #0b214a;
-  color: white;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;         /* Full height */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 30px;
-   z-index: 999 !important;
-}
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-w); background-color: var(--brand-dark); color: white; position: fixed; top: 0; left: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: 30px; z-index: 999; }
+    .sidebar-header { display:flex; flex-direction:column; align-items:center; margin-bottom:25px; }
+    .profile-pic { width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:12px; }
+    .brand-name { font-size:20px; font-weight:bold; margin-bottom:25px; color:white; }
+    .nav-list { list-style:none; padding:0; margin-top:10px; width:100%; }
+    .nav-list li { width:100%; padding:14px 0; text-align:center; cursor:pointer; transition:.3s; border-radius:6px; }
+    .nav-list li a { text-decoration:none; color:white; width:100%; display:block; }
+    .nav-list li:hover { background-color:#19376d; }
+    .nav-list li.active { background-color:#5d8ee9; }
 
-/* Profile & Brand */
-.sidebar-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.sidebar .profile-pic {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 12px;
-}
-
-.brand-name {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 25px;
-  color: white;
-}
-
-/* Menu Items */
-.nav-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
-  width: 100%;
-}
-
-.nav-list li {
-  width: 100%;
-  padding: 14px 0;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.3s;
-  border-radius: 6px;
-}
-
-.nav-list li a {
-  text-decoration: none;
-  color: white;
-  width: 100%;
-  display: block;
-}
-
-/* Hover & Active */
-.nav-list li:hover {
-  background-color: #19376d;
-}
-
-.nav-list li.active {
-  background-color: #5d8ee9;
-}
-
-
-    /* ---------------- Main area ---------------- */
-    .main {
-      margin-left:var(--sidebar-w);
-      width:calc(100% - var(--sidebar-w));
-      min-height:100vh;
-      display:flex; flex-direction:column;
-    }
-
-    /* Topbar */
-    .topbar{
-      position:sticky; top:0; z-index:50;
-      background:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between;
-      box-shadow:0 1px 6px rgba(0,0,0,0.06);
-    }
+    /* Main */
+    .main { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); min-height:100vh; display:flex; flex-direction:column; }
+    .topbar{ position: sticky; top:0; z-index:50; background:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 6px rgba(0,0,0,0.06); }
     .topbar h2{ color:var(--brand-dark); font-size:18px; margin:0 }
     .search-box{ display:flex; align-items:center; gap:8px; background:#f2f6fb; padding:6px 10px; border-radius:20px; border:1px solid #e6eefc }
     .search-box input{ border:none; outline:none; background:transparent; padding:6px; width:220px }
 
-    /* Content area */
     .content-area{ padding:22px; }
-
-    /* Cards */
     .cards { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:18px }
     .card { background:#fff; padding:18px; border-radius:10px; min-width:180px; box-shadow:0 6px 18px rgba(8,48,88,0.04); display:flex; flex-direction:column; align-items:flex-start; gap:8px }
     .card .num { font-size:20px; font-weight:700; color:var(--brand-dark) }
@@ -120,24 +45,31 @@
     .card.soon { border-left:4px solid #f39c12 }
     .card.safe { border-left:4px solid #16a34a }
 
-    /* Controls */
     .controls { display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap }
     .filter-btn { padding:8px 12px; border-radius:8px; border:1px solid #e8eef8; background:white; cursor:pointer }
-    .filter-btn.active { background:#0b8f75; color:white; border-color:transparent }
+    .filter-btn.active { background:var(--brand-green); color:white; border-color:transparent }
 
-    /* Table */
     .panel { background:#fff; padding:14px; border-radius:10px; box-shadow:0 6px 18px rgba(8,48,88,0.04) }
     .table-wrap { overflow:auto; max-height:56vh; margin-top:10px }
     table{ width:100%; border-collapse:collapse; font-size:14px; min-width:900px }
     th,td{ padding:10px 12px; border-bottom:1px solid #eef3fb; text-align:left }
     th{ background:#fbfdff; position:sticky; top:0; z-index:2 }
+
     .badge { padding:6px 8px; border-radius:6px; font-weight:700; display:inline-block }
     .badge.expired { background:#ffe6e6; color:#b00000 }
     .badge.soon { background:#fff4e5; color:#7a5200 }
     .badge.safe { background:#e9f9ee; color:#0b8f75 }
 
-    /* small helpers */
     .muted { color:#6b7280; font-size:13px }
+
+    /* Pagination */
+    .pagination { margin-top:12px; display:flex; gap:6px; flex-wrap:wrap; }
+    .pagination button { padding:6px 10px; border-radius:6px; border:1px solid #e6eefc; background:#fff; cursor:pointer; }
+    .pagination button.active { background:var(--brand-green); color:#fff; border-color:transparent; }
+
+    /* Row highlight */
+    tr.expired-row { background: #fff2f2; }
+    tr.soon-row { background: #fffaf0; }
 
     @media (max-width:900px){
       .search-box input{ width:120px }
@@ -147,14 +79,11 @@
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <img src="image/logo.jpg" alt="logo" class="profile-pic" />
       <div class="brand-name">PharmaTrack</div>
-    
     </div>
-
     <ul class="nav-list">
       <li><a href="home.html">Home</a></li>
       <li><a href="inventory.html">Inventory</a></li>
@@ -164,7 +93,6 @@
     </ul>
   </aside>
 
-  <!-- Main -->
   <div class="main">
     <div class="topbar">
       <h2>Expiry Management</h2>
@@ -175,7 +103,6 @@
     </div>
 
     <div class="content-area">
-      <!-- Summary cards -->
       <div class="cards">
         <div class="card expired">
           <div class="muted">Expired</div>
@@ -194,7 +121,6 @@
         </div>
       </div>
 
-      <!-- Controls -->
       <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px">
         <div class="controls">
           <button class="filter-btn" data-days="30">30 days</button>
@@ -204,13 +130,11 @@
             Current filter: <strong id="filterLabel">60 days</strong>
           </div>
         </div>
-
         <div style="display:flex;gap:10px;align-items:center">
           <div class="muted">Total items in inventory: <strong id="totalItems">0</strong></div>
         </div>
       </div>
 
-      <!-- Panel with tables -->
       <div class="panel">
         <div class="table-wrap">
           <table id="expiryTable">
@@ -225,174 +149,306 @@
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody>
-              <!-- Rows injected here -->
-            </tbody>
+            <tbody></tbody>
           </table>
         </div>
       </div>
 
+      <div class="pagination" id="pagination"></div>
     </div>
   </div>
 
   <script>
-    // KEY used by inventory page
-    const STORAGE_KEY = 'pharma_inventory_v1';
+    /*******************************
+     * Expiry Page - Optimized / Clean
+     * - Reads both medicineStock & inventoryData
+     * - Normalizes keys (case-insensitive)
+     * - Parses YYYY-MM => last day of month
+     * - Accepts dd/mm/yyyy, yyyy-mm-dd, mm/dd/yyyy
+     * - Sorts by expiry (nearest first)
+     *******************************/
 
-    // helpers
-    function parseExpiryToDate(str){
-      if(!str) return null;
-      if(str instanceof Date) return str;
-      // if user stored MM/YYYY (like 01/2026)
-      const mmYYYY = String(str).match(/^(\d{1,2})[\/\-](\d{4})$/);
-      if(mmYYYY){
-        const m = parseInt(mmYYYY[1],10);
-        const y = parseInt(mmYYYY[2],10);
-        return new Date(y, m, 0, 23,59,59); // last day of month
+    // LOCAL STORAGE KEYS (we read both)
+    const KEYS_TO_READ = ['medicineStock', 'inventoryData'];
+
+    // default filter threshold (days)
+    const THRESHOLD_DEFAULT = 60;
+    const ROWS_PER_PAGE = 50;
+
+    // current state
+    let currentThreshold = THRESHOLD_DEFAULT;
+    let filteredData = [];
+
+    // --- Utility: Robust date parser & normalizer ---
+    function parseDate(str) {
+      if (!str && str !== 0) return null;
+      if (str instanceof Date) return str;
+      str = String(str).trim();
+      if (!str || str === '—') return null;
+
+      // 1) YYYY-MM  (e.g., 2025-06) -> treat as last day of month
+      if (/^\d{4}-\d{2}$/.test(str)) {
+        const [y, m] = str.split('-').map(Number);
+        // new Date(year, monthIndex + 1, 0) -> last day of month
+        return new Date(y, m, 0);
       }
-      const iso = Date.parse(str);
-      if(!isNaN(iso)) return new Date(iso);
-      return null;
-    }
 
-    function daysBetween(from, to){
-      const diff = to - from;
-      return Math.ceil(diff / (1000*60*60*24));
-    }
-
-    function computeRowStatus(row, thresholdDays){
-      const qty = Number(row['Qty'] ?? row['qty'] ?? row['Quantity'] ?? 0);
-      const expiryRaw = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '';
-      const d = parseExpiryToDate(expiryRaw);
-      const now = new Date();
-      if(d){
-        const daysLeft = daysBetween(now, d);
-        if(daysLeft < 0) return {status:'EXPIRED', daysLeft};
-        if(daysLeft <= thresholdDays) return {status:'EXPIRING', daysLeft};
-        return {status:'SAFE', daysLeft};
-      } else {
-        // unknown expiry -> treat as safe unless qty low
-        if(!isNaN(qty) && qty <= 20) return {status:'LOW STOCK', daysLeft: null};
-        return {status:'UNKNOWN', daysLeft: null};
+      // 2) dd/mm/yyyy  (e.g., 25/06/2025)
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+        const [d, m, y] = str.split('/').map(Number);
+        return new Date(y, m - 1, d);
       }
+
+      // 3) mm/dd/yyyy (common US format) -> detect if month>12 fallback
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+        // already handled above identical regex; but kept for clarity.
+        const [a, b, c] = str.split('/').map(Number);
+        // if first part > 12 then likely dd/mm/yyyy; already handled earlier
+        return new Date(c, a - 1, b);
+      }
+
+      // 4) yyyy-mm-dd or other ISO-ish -> let JS handle
+      const tryIso = new Date(str);
+      if (!isNaN(tryIso)) return tryIso;
+
+      // 5) fallback: try replacing dots or spaces
+      const alt = str.replace(/\./g, '-').replace(/\s+/g, '');
+      const tryAlt = new Date(alt);
+      return isNaN(tryAlt) ? null : tryAlt;
     }
 
-    function formatExpiry(str){
-      const d = parseExpiryToDate(str);
-      if(!d) return str || '';
-      const mm = String(d.getMonth()+1).padStart(2,'0');
-      const yyyy = d.getFullYear();
-      return mm + '/' + yyyy;
+    // days between two dates (from -> to). rounds up so partial day counts as 1
+    function daysBetween(from, to) {
+      return Math.ceil((to - from) / (1000 * 60 * 60 * 24));
     }
 
-    function badgeForStatus(s){
-      if(!s) return '<span class="badge safe">SAFE</span>';
-      if(s === 'EXPIRED') return '<span class="badge expired">EXPIRED</span>';
-      if(s === 'EXPIRING') return '<span class="badge soon">EXPIRING</span>';
-      if(s === 'LOW STOCK') return '<span class="badge expired">LOW STOCK</span>';
-      return '<span class="badge safe">' + s + '</span>';
+    // return badge HTML by status
+    function badge(status) {
+      if (status === 'Expired') return `<span class="badge expired">EXPIRED</span>`;
+      if (status === 'Near Expiry') return `<span class="badge soon">EXPIRING</span>`;
+      return `<span class="badge safe">SAFE</span>`;
     }
 
-    // load data from localStorage
-    function loadInventory(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return [];
-        return JSON.parse(raw);
-      }catch(e){ console.warn(e); return []; }
+    // --- Normalizer: pick a field from row case-insensitively and with several aliases ---
+    function pickField(row, aliases) {
+      // aliases: array of possible keys in priority order
+      for (const key of aliases) {
+        // direct key
+        if (key in row && row[key] !== undefined && row[key] !== null) return row[key];
+      }
+      // check case-insensitive keys as fallback
+      const keysLower = Object.keys(row).reduce((acc, k) => {
+        acc[k.toLowerCase()] = row[k];
+        return acc;
+      }, {});
+      for (const key of aliases) {
+        const low = key.toLowerCase();
+        if (low in keysLower) return keysLower[low];
+      }
+      return undefined;
     }
 
-    // render table & cards
-    function render(thresholdDays = 60, searchTerm = ''){
-      const data = loadInventory();
+    // normalize a raw row from either source into a consistent object
+    function normalizeRow(raw) {
+      // safe-guard if raw is null/undefined
+      if (!raw || typeof raw !== 'object') return null;
+
+      // extract fields with many alias possibilities
+      const name = pickField(raw, ['Medicine Name', 'name', 'medicineName', 'medicine']);
+      const batch = pickField(raw, ['Batch No.', 'Batch No', 'batch', 'batchNumber']);
+      const category = pickField(raw, ['Category', 'category']);
+      const qty = pickField(raw, ['Qty', 'qty', 'quantity', 'Quantity']);
+      // expiry might be stored under "Expiry", "Expiry Date", "expiry", "expiryDate", etc.
+      const expiryRaw = pickField(raw, ['Expiry Date', 'Expiry', 'expiry', 'expiryDate', 'ExpiryDate']);
+      const statusField = pickField(raw, ['Status', 'status']);
+
+      // Ensure numeric qty
+      const qtyNum = (qty === undefined || qty === null || qty === '') ? 0 : Number(qty);
+
+      return {
+        raw, // keep original in case you want to inspect
+        name: name ?? '—',
+        batch: batch ?? '—',
+        category: category ?? '—',
+        qty: Number.isFinite(qtyNum) ? qtyNum : 0,
+        expiryRaw: expiryRaw ?? '',
+        statusField: statusField ?? ''
+      };
+    }
+
+    // load both localStorage keys and merge into one array (no dedupe)
+    function loadAllInventory() {
+      const combined = [];
+      KEYS_TO_READ.forEach(key => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+          const arr = JSON.parse(raw);
+          if (!Array.isArray(arr)) return;
+          arr.forEach(item => {
+            const norm = normalizeRow(item);
+            if (norm) combined.push(norm);
+          });
+        } catch (e) {
+          // corrupted JSON or other error -> skip
+          console.warn('Error reading key', key, e);
+        }
+      });
+      return combined;
+    }
+
+    // compute status using expiryRaw and threshold
+    function computeStatus(expiryRaw, thresholdDays) {
+      const d = parseDate(expiryRaw);
+      if (!d) return { status: 'Safe', days: null, dateObj: null };
+      const left = daysBetween(new Date(), d);
+      if (left < 0) return { status: 'Expired', days: left, dateObj: d };
+      if (left <= thresholdDays) return { status: 'Near Expiry', days: left, dateObj: d };
+      return { status: 'Safe', days: left, dateObj: d };
+    }
+
+    // format date in DD/MM/YYYY (user requested)
+    function formatDisplayDate(dateObj) {
+      if (!dateObj) return '—';
+      const dd = String(dateObj.getDate()).padStart(2, '0');
+      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const yyyy = dateObj.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+
+    // RENDERING
+    function renderTable(data, page = 1, threshold = THRESHOLD_DEFAULT) {
       const tbody = document.querySelector('#expiryTable tbody');
       tbody.innerHTML = '';
 
-      let total = data.length;
-      let expiredCount = 0;
-      let soonCount = 0;
-      let safeCount = 0;
+      // Sorting: nearest expiry first; entries with no expiry go last
+      data.sort((a, b) => {
+        const da = parseDate(a.expiryRaw);
+        const db = parseDate(b.expiryRaw);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return da - db;
+      });
 
-      const now = new Date();
-      const s = (searchTerm||'').toLowerCase().trim();
+      // Pagination slicing
+      const start = (page - 1) * ROWS_PER_PAGE;
+      const end = Math.min(start + ROWS_PER_PAGE, data.length);
+      let expired = 0, soon = 0, safe = 0;
 
-      data.forEach(row=>{
-        const name = (row['Medicine Name'] ?? row['name'] ?? '').toString();
-        const batch = (row['Batch No.'] ?? row['batch'] ?? '').toString();
-        const category = (row['Category'] ?? row['category'] ?? '').toString();
-        const qty = row['Qty'] ?? row['qty'] ?? row['Quantity'] ?? 0;
-        const expiryRaw = row['Expiry Date'] ?? row['Expiry'] ?? row['expiry'] ?? '';
-        const d = parseExpiryToDate(expiryRaw);
-        const daysLeft = d ? daysBetween(now, d) : null;
+      for (let i = start; i < end; i++) {
+        const row = data[i];
+        const st = computeStatus(row.expiryRaw, threshold);
+        if (st.status === 'Expired') expired++;
+        else if (st.status === 'Near Expiry') soon++;
+        else safe++;
 
-        // compute status using thresholdDays
-        const st = computeRowStatus(row, thresholdDays);
-
-        // filter by search
-        const combined = (name + ' ' + batch + ' ' + category).toLowerCase();
-        if(s && !combined.includes(s)) return;
-
-        // count categories
-        if(st.status === 'EXPIRED') expiredCount++;
-        else if(st.status === 'EXPIRING') soonCount++;
-        else safeCount++;
-
-        const daysText = daysLeft === null ? '—' : (daysLeft < 0 ? (Math.abs(daysLeft) + ' days ago') : (daysLeft + ' days'));
-        const expiryDisplay = formatExpiry(expiryRaw);
+        const expiryDisplay = st.dateObj ? formatDisplayDate(st.dateObj) : '—';
+        const daysText = (st.days === null) ? '—' : (st.days < 0 ? `${Math.abs(st.days)} days ago` : `${st.days} days`);
 
         const tr = document.createElement('tr');
+        // add classes for row highlight
+        if (st.status === 'Expired') tr.classList.add('expired-row');
+        else if (st.status === 'Near Expiry') tr.classList.add('soon-row');
+
         tr.innerHTML = `
-          <td>${escapeHtml(name)}</td>
-          <td>${escapeHtml(batch)}</td>
-          <td>${escapeHtml(category)}</td>
-          <td>${escapeHtml(qty)}</td>
-          <td>${escapeHtml(expiryDisplay)}</td>
-          <td>${escapeHtml(daysText)}</td>
-          <td>${badgeForStatus(st.status)}</td>
+          <td>${escapeHtml(row.name)}</td>
+          <td>${escapeHtml(row.batch)}</td>
+          <td>${escapeHtml(row.category)}</td>
+          <td>${row.qty}</td>
+          <td>${expiryDisplay}</td>
+          <td>${daysText}</td>
+          <td>${badge(st.status)}</td>
         `;
         tbody.appendChild(tr);
-      });
+      }
 
-      document.getElementById('expiredCount').textContent = expiredCount;
-      document.getElementById('soonCount').textContent = soonCount;
-      document.getElementById('safeCount').textContent = safeCount;
-      document.getElementById('totalItems').textContent = total;
+      document.getElementById('expiredCount').textContent = expired;
+      document.getElementById('soonCount').textContent = soon;
+      document.getElementById('safeCount').textContent = safe;
+      document.getElementById('totalItems').textContent = data.length;
+
+      renderPagination(data.length, page);
     }
 
-    function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+    // pagination UI
+    function renderPagination(totalItems, currentPage) {
+      const totalPages = Math.max(1, Math.ceil(totalItems / ROWS_PER_PAGE));
+      const container = document.getElementById('pagination');
+      container.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+          renderTable(filteredData, i, currentThreshold);
+        });
+        container.appendChild(btn);
+      }
+    }
 
-    // UI wiring
-    (function initUI(){
-      let selectedDays = 60;
-      const filterButtons = document.querySelectorAll('.filter-btn');
-      filterButtons.forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          filterButtons.forEach(b=>b.classList.remove('active'));
+    // Escape HTML to avoid accidental injection if data contains special chars
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // renderAll: load, filter by search, set filteredData
+    function renderAll(searchTerm = '') {
+      const all = loadAllInventory();
+
+      // filter by search term (name, batch, category)
+      const s = String(searchTerm || '').toLowerCase().trim();
+      filteredData = all.filter(row => {
+        const combined = `${row.name} ${row.batch} ${row.category}`.toLowerCase();
+        return combined.includes(s);
+      });
+
+      // Sort by expiry nearest first (renderTable re-sorts anyway but keep here)
+      filteredData.sort((a, b) => {
+        const da = parseDate(a.expiryRaw);
+        const db = parseDate(b.expiryRaw);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return da - db;
+      });
+
+      // Render first page
+      renderTable(filteredData, 1, currentThreshold);
+    }
+
+    // Initialize UI and events
+    (function initUI() {
+      // filter buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          selectedDays = Number(btn.getAttribute('data-days') || 60);
-          document.getElementById('filterLabel').textContent = selectedDays + ' days';
-          render(selectedDays, document.getElementById('searchInput').value);
+          currentThreshold = Number(btn.dataset.days);
+          document.getElementById('filterLabel').textContent = currentThreshold + ' days';
+          renderAll(document.getElementById('searchInput').value);
         });
       });
 
-      // search
-      document.getElementById('searchInput').addEventListener('input', (e)=>{
-        render(selectedDays, e.target.value);
+      // search input
+      const si = document.getElementById('searchInput');
+      si.addEventListener('input', e => {
+        renderAll(e.target.value);
       });
 
-      // highlight active menu (ensure expiry active)
-      (function highlightActive(){
-        const current = window.location.pathname.split('/').pop() || 'expiry.html';
-        document.querySelectorAll('.nav-list li').forEach(li=>{
-          const a = li.querySelector('a');
-          if(!a) return;
-          if(a.getAttribute('href') === current) li.classList.add('active');
-          else li.classList.remove('active');
-        });
-      })();
+      // search button click (optional)
+      document.getElementById('searchBtn').addEventListener('click', () => {
+        renderAll(document.getElementById('searchInput').value);
+      });
 
       // initial render
-      render(selectedDays, '');
+      renderAll();
     })();
   </script>
 </body>
